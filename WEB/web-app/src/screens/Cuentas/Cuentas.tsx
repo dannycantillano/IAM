@@ -1,5 +1,5 @@
 // src/pages/Cuentas.tsx
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   DTO_Negocio,
   DTO_Respuesta,
@@ -19,6 +19,7 @@ import {
   cuentasFormAddFields,
   formatColones,
   formatDetalleJSON,
+  compararObjetos,
 } from "@/utils";
 import {
   ConfirmModal,
@@ -26,6 +27,7 @@ import {
   DynamicButtonConfig,
   FieldConfig,
   GenericDataTable,
+  GenericDataTableHandle,
   GenericFormModal,
   InfoModal,
   InfoPanel,
@@ -37,9 +39,13 @@ import { labelMapCuenta as labelMap } from "@/utils";
 import Select from "react-select";
 import { valida_DTO_Cuenta } from "@/validators/valida_DTO_Cuenta";
 
+
+
+
 //#region 🔁 Estado Global y Negocio
 //#region 🔁 Estado Global y Negocio
 export const Cuentas = () => {
+  const tableRef = useRef<GenericDataTableHandle<DTO_Cuenta>>(null);
   const { state } = useApp();
 
   // #region Validaciones en los formularios
@@ -139,21 +145,34 @@ export const Cuentas = () => {
     if (!selectedBusiness) return;
     cuentasService.obtenerCuentas(selectedBusiness).subscribe({
       next: (result) => {
-        const res = (procesarRespuesta(
-          result as unknown as DTO_Respuesta
-        ) as DTO_Cuenta[]) || [];
+        const res = (procesarRespuesta(result as DTO_Respuesta) as DTO_Cuenta[]) || [];
+        const filterAccounts = res.filter(b => b.estado?.iD_Estado !== STATUS_TBL.ACCOUNT.DELETED);
 
-        const filterAccounts = res.filter(
-          (b) => b.estado?.iD_Estado !== STATUS_TBL.ACCOUNT.DELETED
-        );
 
+
+        // (Opcional) si igual quieres mantener el estado local para otros usos:
         setAccountsPayable(filterAccounts);
       },
-      error: (err) => errorHelpers.serverError(err),
-      complete: () => {},
+      error: errorHelpers.serverError,
     });
   };
   //#endregion
+
+
+
+  const actualizarCamposCalculadosCuenta = (cuenta: DTO_Cuenta) => {
+
+    if (cuenta.montoAbonado >= cuenta.monto)
+      cuenta.estadoPago = "Pagada"
+    else
+      cuenta.estadoPago = "Pendiente"
+
+    cuenta.saldoPendiente = cuenta.monto - cuenta.montoAbonado
+
+    return cuenta;
+
+  }
+
 
   //#region ➕ Crear cuenta - Funciones
   const handleAddNew = () => {
@@ -173,9 +192,11 @@ export const Cuentas = () => {
     if (validacion.length === 0) {
       cuentasService.registrarCuenta(formData).subscribe({
         next: (result: any) => {
-          const nueva = (result.resultado as DTO_Cuenta[])[0];
+          let nueva = (result.resultado as DTO_Cuenta[])[0];
           if (nueva.estado?.iD_Estado !== STATUS_TBL.ACCOUNT.DELETED) {
             setAccountsPayable((prev) => [nueva, ...prev]);
+            nueva = actualizarCamposCalculadosCuenta(nueva);
+            tableRef.current?.upsert(nueva);
           }
           notificationHelpers.successAlert(
             result.mensaje || "Cuenta registrada correctamente"
@@ -196,9 +217,15 @@ export const Cuentas = () => {
   };
 
   const handleCancelAdd = () => {
-    setConfirmModalMessage("¿Estás seguro de que deseas cancelar el registro?");
     setConfirmContext("cancelAdd");
-    setIsConfirmOpen(true);
+    //entramos a sacar el modal de confirmación solo si no son vacios los valores
+    if (!compararObjetos(formData as DTO_Cuenta, new DTO_Cuenta, ['fechaInicial', 'fechaModificacion'])) {
+
+      setConfirmModalMessage("¿Estás seguro de que deseas cancelar el registro?");
+      setIsConfirmOpen(true);
+    }else{
+     setIsModalFormOpen(false);
+    }
   };
   //#endregion
 
@@ -213,8 +240,7 @@ export const Cuentas = () => {
   };
 
   const handleSaveEdit = (updatedData: DTO_Cuenta) => {
-    const parsed = parseFloat(montoInput.replace(/[^0-9.]/g, ""));
-    updatedData.monto = isNaN(parsed) ? 0 : parsed;
+
 
     if (!rowEditSelected) return;
     updatedData.iD_Cuenta = rowEditSelected.iD_Cuenta;
@@ -224,9 +250,9 @@ export const Cuentas = () => {
       updatedData.estado = { ...rowEditSelected.estado };
     }
 
-    if (!detalleHabilitado) {
+    if (detalleHabilitado) {
       const parsed = parseFloat(montoInput.replace(/[^0-9.]/g, ""));
-      updatedData.monto = parsed;
+      updatedData.monto = isNaN(parsed) ? 0 : parsed;
     }
 
     validacion = valida_DTO_Cuenta.validar(updatedData, "U");
@@ -238,7 +264,10 @@ export const Cuentas = () => {
             (result as DTO_Respuesta)?.mensaje ||
             "Cuenta actualizada correctamente";
           notificationHelpers.successAlert(mensaje);
-          refetchAccounts();
+
+          updatedData = actualizarCamposCalculadosCuenta(updatedData);
+          tableRef.current?.upsert(updatedData);
+          //refetchAccounts();
           setShowEditModal(false);
         },
         error: (err) => errorHelpers.serverError(err),
@@ -259,6 +288,7 @@ export const Cuentas = () => {
     setAccountToDelete(rowData);
     setConfirmContext("delete");
     setIsConfirmOpen(true);
+    
   };
 
   const handleConfirmDelete = (action: boolean | null) => {
@@ -276,6 +306,7 @@ export const Cuentas = () => {
         next: (result: DTO_Respuesta) => {
           if (result.codigo !== "B012") {
             notificationHelpers.successAlert("Cuenta eliminada correctamente");
+            tableRef.current?.removeById(updatedData.iD_Cuenta);
             setAccountsPayable((prev) =>
               prev.filter((c) => c.iD_Cuenta !== accountToDelete.iD_Cuenta)
             );
@@ -330,6 +361,18 @@ export const Cuentas = () => {
       val ? new Date(String(val)).toLocaleDateString() : "",
     fechaLimite: (val: unknown) =>
       val ? new Date(String(val)).toLocaleDateString() : "",
+    montoAbonado: (val: unknown) =>
+      new Intl.NumberFormat("es-CR", {
+        style: "currency",
+        currency: "CRC",
+        minimumFractionDigits: 2,
+      }).format(Number(val) || 0),
+    saldoPendiente: (val: unknown) =>
+      new Intl.NumberFormat("es-CR", {
+        style: "currency",
+        currency: "CRC",
+        minimumFractionDigits: 2,
+      }).format(Number(val) || 0),
   };
 
   //#region custom column DetallesJson
@@ -355,7 +398,7 @@ export const Cuentas = () => {
     ...cuentasFormAddFields,
     {
       key: "detalleJSON",
-      label: "Detalle",
+      label: "",
       type: "custom",
       required: false,
       order: 6,
@@ -367,6 +410,7 @@ export const Cuentas = () => {
           onChange={onChange}
           monto={formData.monto}
           setMonto={(val) => {
+            console.log(val);
             setFormData({ ...formData, monto: val });
             setMontoInput(val !== 0 ? String(val) : "");
           }}
@@ -386,7 +430,7 @@ export const Cuentas = () => {
           <div className="input-group">
             <span className="input-group-text">₡</span>
             <input
-              type="text"
+              type="number"
               className="form-control fw-bold fs-5 text-start"
               readOnly={detalleHabilitado}
               value={montoInput}
@@ -398,20 +442,19 @@ export const Cuentas = () => {
               onChange={(e) => {
                 const val = e.target.value.replace(/[^0-9.]/g, "");
                 setMontoInput(val);
-                if (val === "") {
-                  setFormData({ ...formData, monto: 0 });
-                } else {
-                  const num = parseFloat(val);
-                  setFormData({ ...formData, monto: isNaN(num) ? 0 : num });
-                }
+                const num = parseFloat(val);
+                setFormData({ ...formData, monto: num });
               }}
+
+
+
               onBlur={(e) => {
                 if (e.target.value === "" || isNaN(Number(e.target.value))) {
                   setMontoInput("");
                   setFormData({ ...formData, monto: 0 });
                 }
               }}
-              placeholder="₡0.00"
+              placeholder="0.00"
               min={0}
               step={0.01}
             />
@@ -431,12 +474,12 @@ export const Cuentas = () => {
           value={
             value
               ? {
-                  label:
-                    value === "Cuenta Por Pagar"
-                      ? "Cuenta Por Pagar"
-                      : "Cuenta Por Cobrar",
-                  value,
-                }
+                label:
+                  value === "Cuenta Por Pagar"
+                    ? "Cuenta Por Pagar"
+                    : "Cuenta Por Cobrar",
+                value,
+              }
               : null
           }
           onChange={(option) => {
@@ -460,20 +503,20 @@ export const Cuentas = () => {
   //#region ✏️ Editar cuenta - Campos formulario
   const isCuentaPorCobrarOS = !!(
     editData?.concepto &&
-    /^Cuenta por cobrar de la orden de servicio #\d+$/i.test(editData.concepto)
+    /^Cobro de Orden de Servicio #\d+$/i.test(editData.concepto)
   );
 
   const formEditFields: FieldConfig<any>[] = [
     ...cuentasFormEditFields,
     ...(editData?.iD_OrdenServicio
       ? [
-          {
-            key: "iD_OrdenServicio",
-            label: "Orden De Servicio #",
-            type: "text",
-            order: 4,
-          } as FieldConfig<any>,
-        ]
+        {
+          key: "iD_OrdenServicio",
+          label: "Orden De Servicio #",
+          type: "text",
+          order: 4,
+        } as FieldConfig<any>,
+      ]
       : []),
     {
       key: "detalleJSON",
@@ -508,16 +551,15 @@ export const Cuentas = () => {
             <span className="input-group-text">₡</span>
             <input
               type="text"
-              className={`form-control fw-bold fs-5 text-start ${
-                detalleHabilitado ? "bg-light" : ""
-              }`}
+              className={`form-control fw-bold fs-5 text-start ${detalleHabilitado ? "bg-light" : ""
+                }`}
               readOnly={detalleHabilitado}
               value={
                 montoInput !== ""
                   ? montoInput
                   : editData?.monto !== undefined && editData?.monto !== 0
-                  ? String(editData.monto)
-                  : ""
+                    ? String(editData.monto)
+                    : ""
               }
               onFocus={() => {
                 if ((editData?.monto || 0) === 0) {
@@ -539,10 +581,17 @@ export const Cuentas = () => {
                   setEditData((prev) => (prev ? { ...prev, monto: 0 } : null));
                 }
               }}
-              placeholder="₡0.00"
+              placeholder="0.00"
               min={0}
               step={0.01}
             />
+            {detalleHabilitado && (
+              <div style={{ width: '100%' }} className="form-text text-muted small opacity-75">
+                Con la opción "Detalle" habilitada este campo es calculado.
+              </div>
+            )}
+
+
           </div>
         );
       },
@@ -552,6 +601,7 @@ export const Cuentas = () => {
       label: labelMapCuenta["concepto"] ?? "Concepto",
       type: "text",
       order: 5,
+      required: true,
       readOnly: isCuentaPorCobrarOS,
     },
     {
@@ -561,18 +611,19 @@ export const Cuentas = () => {
       required: !isCuentaPorCobrarOS,
       errorMessage: "Seleccione un tipo de cuenta",
       order: 9,
+      readOnly: editData?.tipoCuenta == "Cuenta",
       renderer: ({ value, onChange }) => (
         <Select
           isDisabled={isCuentaPorCobrarOS}
           value={
             value
               ? {
-                  label:
-                    value === "Cuenta Por Pagar"
-                      ? "Cuenta Por Pagar"
-                      : "Cuenta Por Cobrar",
-                  value,
-                }
+                label:
+                  value === "Cuenta Por Pagar"
+                    ? "Cuenta Por Pagar"
+                    : "Cuenta Por Cobrar",
+                value,
+              }
               : null
           }
           onChange={(option) => {
@@ -597,13 +648,13 @@ export const Cuentas = () => {
   const infoModalFields: FieldConfig<any>[] = [
     ...(rowTableSelected?.iD_OrdenServicio
       ? [
-          {
-            key: "iD_OrdenServicio",
-            label: "Orden De Servicio #",
-            type: "text",
-            order: 0,
-          } as FieldConfig<any>,
-        ]
+        {
+          key: "iD_OrdenServicio",
+          label: "Orden De Servicio",
+          type: "text",
+          order: 1,
+        } as FieldConfig<any>,
+      ]
       : []),
     ...keysInfoModalCuenta,
     {
@@ -612,101 +663,199 @@ export const Cuentas = () => {
       type: "custom",
       order: 6,
       renderer: ({ value }) => {
-        if (!value) {
-          return (
-            <div className="text-muted fst-italic">
-              <i className="bi bi-info-circle me-2"></i>
-              Sin detalles registrados
-            </div>
-          );
-        }
-
         const detalle = value as DTO_DetalleCuentaJSON;
         const filas = detalle.filas ?? [];
 
+        if (filas.length == 0 && detalle.descuento.valor == "" && detalle.impuesto.valor == "") {
+          return (
+            <>---</>
+          );
+        }
+
+
+
         return (
           <div className="d-flex flex-column gap-4">
-            <div className="d-flex flex-wrap gap-4">
-              <div className="bg-light border rounded px-4 py-3 d-flex flex-column shadow-sm">
-                <span className="text-muted fw-semibold small">Descuento</span>
-                <span className="fw-bold text-gray-800 fs-6">
-                  {detalle.descuento?.nombre === "Monto"
-                    ? `₡${Number(detalle.descuento?.valor ?? 0).toLocaleString(
-                        "es-CR",
-                        {
-                          minimumFractionDigits: 2,
-                        }
-                      )}`
-                    : `${Number(detalle.descuento?.valor ?? 0).toLocaleString(
-                        "es-CR"
-                      )}%`}
-                </span>
-              </div>
-              <div className="bg-light border rounded px-4 py-3 d-flex flex-column shadow-sm">
-                <span className="text-muted fw-semibold small">Impuesto</span>
-                <span className="fw-bold text-gray-800 fs-6">
-                  {Number(detalle.impuesto?.valor ?? 0).toLocaleString("es-CR")}
-                  %
-                </span>
-              </div>
-              <div className="bg-light border rounded px-4 py-3 d-flex flex-column shadow-sm">
-                <span className="text-muted fw-semibold small">Filas</span>
-                <span className="fw-bold text-gray-800 fs-6">
-                  {filas.length}
-                </span>
-              </div>
-            </div>
+
             {filas.length > 0 && (
-              <div className="table-responsive bg-white border rounded shadow-sm p-0">
-                <table className="table table-borderless table-sm align-middle w-100 mb-0">
-                  <thead className="bg-light text-muted text-uppercase fs-8 fw-bold">
+              <div>
+
+
+                <table className="table table-sm align-middle dtr-inline" id="DataTables_Table_28" aria-describedby="DataTables_Table_28_info" data-zebra-custom="398bc2">
+                  <thead className="text-muted fs-8 fw-bold">
                     <tr>
-                      <th className="ps-4 w-60">Nombre</th>
-                      <th className="text-end pe-4 w-40">Valor</th>
+                      <th className="text-center w-60"></th>
+                      <th className="text-center w-60"></th>
+                      <th className="text-center w-60"></th>
+                      <th className="text-center w-60"></th>
+                      <th className="text-center w-60"></th>
                     </tr>
                   </thead>
+
                   <tbody>
-                    {filas.map((fila, idx) => (
-                      <tr key={idx} className="border-bottom border-gray-200">
-                        <td className="ps-4">
-                          <div className="d-flex align-items-center gap-3">
-                            <span className="badge bg-light fw-bold text-dark fs-8 px-2 py-1 shadow-sm">
-                              #{idx + 1}
-                            </span>
-                            <span className="fw-semibold text-gray-800 fs-6">
-                              {fila.nombre}
-                            </span>
+                    {filas.length === 0 && (
+
+
+                      <tr className="no-hover-row">
+                        <td colSpan={5} className="dt-empty">
+                          <div className="dt-empty-state d-flex flex-column align-items-center justify-content-center py-10">
+                            <i className="bi bi-inbox fs-1 text-muted" aria-hidden="true"></i>
+                            <span className="text-muted mt-2">Sin datos</span>
                           </div>
                         </td>
-                        <td className="text-end pe-4">
-                          <span className="fw-bold text-dark fs-6">
-                            {formatColones(fila.valor)}
-                          </span>
-                        </td>
                       </tr>
+                    )}
+
+                    {filas.map((it, idx) => (
+                      <React.Fragment key={'CardItemProforma' + idx}>
+
+
+                        {/* ======= Vista MÓVIL (< sm): grid 8/2/1/1 ======= */}
+
+                        <tr className="d-table-row">
+                          <td colSpan={4} className="pb-4">
+                            <div className="p-2 py-4 pb-2 pt-1 border border-secoundary rounded-3 hoverElement">
+                              <div className="row py-2 pb-5">
+                                <div className="col-10"><span className="fs-7 text-gray-600 mt-2">{'#' + (idx + 1)}</span></div>
+                                <div className="text-end col-2">
+
+
+              
+
+
+
+                                </div>
+
+
+
+                              </div>
+
+                              <div className="row g-1">
+
+                                <div className="col-6">
+                                  <label htmlFor={'txtNombre' + idx.toString()} className="fs-7 text-gray-600">Nombre</label>
+                                  <p>{it.nombre}</p>
+                                </div>
+
+                                <div className="col-3">
+                                  <label htmlFor={'txtPrecio' + idx.toString()} className="fs-7 text-gray-600">Monto</label>
+                                  <p>{formatColones(it.valor)}</p>
+                                </div>
+
+
+                                <div className="col-3">
+                                  <label htmlFor={'txtCantidad' + idx.toString()} className="fs-7 text-gray-600">Cantidad</label>
+                                  <p>{it.cantidad || 1}</p>
+
+                                </div>
+
+
+              
+                                <div className="row p-0">
+                                  <div className="text-start col-6"></div>
+                                  <div className="text-end col-6"><span className="fs-7 text-gray-600 mt-2">Importe</span> <span className="fs-7 text-gray-600 mt-2 ">{formatColones((+it.cantidad || 1) * (+it.valor || 0))}</span></div>
+
+
+
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </React.Fragment>
                     ))}
+
+
                   </tbody>
+
                 </table>
+
+
+
               </div>
             )}
+            <div className="d-flex flex-wrap gap-4 pt-5">
+              <div className="d-flex flex-column">
+                <span className="text-muted fs-5">Descuento:  <span className="fw-bold text-dark fs-5">
+                  {detalle.descuento?.nombre === "Monto"
+                    ? `₡${Number(detalle.descuento?.valor ?? 0).toLocaleString(
+                      "es-CR",
+                      {
+                        minimumFractionDigits: 2,
+                      }
+                    )}`
+                    : `${Number(detalle.descuento?.valor ?? 0).toLocaleString(
+                      "es-CR"
+                    )}%`}
+                </span></span>
+
+              </div>
+              <div className="d-flex flex-column">
+                <span className="text-muted fs-5">Impuesto:   <span className="fw-bold text-dark fs-5">
+                  {Number(detalle.impuesto?.valor ?? 0).toLocaleString("es-CR")}
+                  %
+                </span></span>
+
+              </div>
+              {/* <div className="py-3 d-flex flex-column">
+                <span className="text-muted fw-semibold small">Filas: <span className="fw-bold text-gray-800 fs-6">
+                  {filas.length}
+                </span></span>
+                
+              </div> */}
+            </div>
           </div>
         );
       },
     },
     {
       key: "monto",
-      label: "Monto (₡)",
+      label: "Monto Inicial",
       type: "custom",
       order: 9,
       renderer: ({ value }) => {
         const monto = Number(value || 0);
 
         return (
-          <div className="border border-gray-200 rounded px-4 py-3 d-flex align-items-center justify-content-between shadow-sm">
-            <i className="bi bi-cash-coin fs-4 text-gray-600 me-3"></i>
-            <span className="fw-semibold fs-5 text-gray-800"></span>
+          <>
+
+            <span className="fs-5 text-dark text-end"></span>
             {formatColones(monto)}
-          </div>
+          </>
+        );
+      },
+    },
+    {
+      key: "montoAbonado",
+      label: "Monto Abonado",
+      type: "custom",
+      order: 10,
+      renderer: ({ value }) => {
+        const monto = Number(value || 0);
+
+        return (
+          <>
+
+            <span className="fs-5 text-dark text-end"></span>
+            {formatColones(monto)}
+          </>
+        );
+      },
+    },
+    {
+      key: "saldoPendiente",
+      label: "Saldo",
+      type: "custom",
+      order: 11,
+      renderer: ({ value }) => {
+        const monto = Number(value || 0);
+
+        return (
+          <>
+
+            <span className="fs-5 text-dark text-end"></span>
+            {formatColones(monto)}
+          </>
         );
       },
     },
@@ -748,7 +897,7 @@ export const Cuentas = () => {
     },
   ];
   //#endregion
-  
+
   //#region 🧩 Botones de la tabla
   const dataTableButtons: DynamicButtonConfig[] = [
     {
@@ -770,28 +919,30 @@ export const Cuentas = () => {
           <InfoPanel msj="Seleccione un negocio para ver sus cuentas." />
         ) : (
           <>
+
             <GenericDataTable<DTO_Cuenta>
+              ref={tableRef}
               title="Cuentas"
               columnKeys={columnKeysCuenta}
               labelMap={labelMapCuenta}
-              data={accountsPayable}
+              data={accountsPayable}       // se carga 1 sola vez
+              independent                  // ⇦ clave para que NO escuche más cambios del padre
+              idField="iD_Cuenta"          // ⇦ campo ID que usa upsert/remove
               onAdd={handleAddNew}
               onEdit={handleEdit}
               onDelete={handleDelete}
               disableButtonAdd={disableButtonAdd}
-              includeEstadoColumn
+              includeEstadoColumn={false}
               customRenderers={customRenderers}
-                customColumns={[detalleJSONColumn]}
-                dataTableButtons={dataTableButtons}
-              onRowClick={(row) => {
-                setRowTableSelected(row);
-                setIsInfoModalOpen(true);
-              }}
+              customColumns={[detalleJSONColumn]}
+              dataTableButtons={dataTableButtons}
+              onRowClick={(row) => { setRowTableSelected(row); setIsInfoModalOpen(true); }}
+              nowrapColumns={['iD_Cuenta', 'monto', 'montoAbonado', 'saldoPendiente', "tipoCuenta"]}
             />
 
             <InfoModal
               show={isInfoModalOpen}
-              onHide={() => setRowTableSelected(undefined)}
+              onHide={() => { setIsInfoModalOpen(false); setRowTableSelected(undefined); }}
               data={rowTableSelected!}
               fields={infoModalFields}
               headerButtons={headerButtonsToInfo}
@@ -812,7 +963,7 @@ export const Cuentas = () => {
             <GenericFormModal<DTO_Cuenta>
               title="Editar Cuenta"
               show={showEditModal}
-              onHide={() => setShowEditModal(false)}
+              onHide={() => { setShowEditModal(false); setErroresValidacion([]); }}
               data={editData!}
               setData={(x) => setEditData(x as DTO_Cuenta)}
               onSubmit={() => {
@@ -834,9 +985,10 @@ export const Cuentas = () => {
 
             <TransaccionesPorCuentaModal
               open={isTransaccionesModalOpen}
-              onHide={() => setIsTransaccionesModalOpen(false)}
+              onHide={() => { setIsTransaccionesModalOpen(false); }}
               cuenta={accountTransactions || new DTO_Cuenta()}
               negocioId={selectedBusiness?.iD_Negocio || 0}
+              onChange={(cuenta) => { tableRef.current?.upsert(cuenta) }}
             />
           </>
         )}

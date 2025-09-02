@@ -92,7 +92,7 @@ export const Home = () => {
         {/* Select: visible solo en xs */}
         <div
           className="container-fluid d-block d-sm-none"
-          style={{ paddingTop: "5px;", paddingBottom: "5px;" }}
+          style={{ paddingTop: "5px", paddingBottom: "5px" }}
         >
           <select
             className="form-select"
@@ -107,12 +107,12 @@ export const Home = () => {
           </select>
         </div>
       </div>
-
+ 
       <div className="row p-4 gx-0">
         {loading ? (
           <LoadingPanel msj="Cargando transacciones..." />
         ) : selectedBusiness ? (
-          <div className="col-xl-12" style={{ marginTop: "30px" }}>
+          <div className="col-xl-12" style={{ marginTop: "75px" }}>
         <div className="card card-xl-stretch mb-xl-8">
           <div className="card-body p-4">
             <div className="card position-relative">

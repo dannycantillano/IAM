@@ -7,6 +7,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { ROUTES } from "@/constants";
 import { valida_DTO_Usuario } from "@/validators/valida_DTO_Usuario";
 
+//Imagenes
+import imgLogo from "@/assets/media/logos/logo-1.svg";
+import imgBG from "@/assets/media/illustrations/unitedpalms-1/14-1.png";
+
+
 export const SignUp = () => {
   // #region Validaciones en los formularios
   const [erroresValidacion, setErroresValidacion] = useState<DTO_Param[]>([]);
@@ -35,7 +40,6 @@ export const SignUp = () => {
     if (
       usuarioValidator.validarDatosRegistroUsuario(usuario, confirmacionPass)
     ) {
-      console.log("Datos de registro válidos");
 
       registrarUsuario();
     }
@@ -74,16 +78,13 @@ export const SignUp = () => {
     <div className="d-flex flex-column flex-root">
       <div
         className="d-flex flex-column flex-column-fluid bgi-position-y-bottom position-x-center bgi-no-repeat bgi-size-contain bgi-attachment-fixed"
-        style={{
-          backgroundImage:
-            'url("src/assets/media/illustrations/unitedpalms-1/14-1.png")',
-        }}
+          style={{ backgroundImage: `url(${imgBG})` }}
       >
         <div className="d-flex flex-center flex-column flex-column-fluid p-10 pb-lg-20">
-          <a href="../../demo6/dist/index.html" className="mb-12">
+          <a className="mb-12">
             <img
               alt="Logo"
-              src="src/assets/media/logos/logo-1.svg"
+              src={imgLogo}
               className="h-40px"
             />
           </a>

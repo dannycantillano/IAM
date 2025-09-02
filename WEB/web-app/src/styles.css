@@ -34,7 +34,7 @@ table.dataTable thead th {
 }
 
 .table-hover tbody tr:hover {
-  background-color: #009EF7 !important;
+  background-color: #3e96d2 !important;
   color: #fff !important;
 }
 
@@ -51,7 +51,7 @@ table.dataTable thead th {
   background-color: rgba(0, 0, 0, 0.3);
   /* Más claro */
   backdrop-filter: blur(5px);
-  padding: 20px;
+  /*padding: 20px;*/
 }
 
 .shadowDarkBackground {
@@ -161,7 +161,7 @@ table.dataTable thead th {
   padding: 2px;
   /* grosor del borde         */
   border-radius: inherit;
-  background: #009EF7;
+  background: #3e96d2;
   /* azul brillante           */
 
   /* solo la franja del borde */
@@ -176,6 +176,7 @@ table.dataTable thead th {
   /* dura 3 s, luego desaparece */
   pointer-events: none;
 }
+
 
 /* Animación: aparece, mantiene, se desvanece */
 @keyframes flashBorder {
@@ -243,3 +244,101 @@ table.dataTable thead th {
 
   }
 } */
+
+
+
+/*Para bloquear el scroll del body cuando se abre un modal*/
+/* Evita “empuje”/rebote en móviles y fuga de scroll */
+body.modal-open {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  touch-action: none;
+}
+
+/* Si tu scroll real está en .app-scroll, añade: */
+.modal-open .app-scroll {
+  overflow: hidden !important;
+}
+
+
+/* El propio modal tampoco debe propagar overscroll al fondo */
+.modal {
+  overscroll-behavior: contain;
+}
+
+/* Si tu app scrollea en un contenedor distinto al body */
+.modal-open .app-scroll {
+  overflow: hidden !important;
+}
+
+.modal-open .app-scroll {
+  overflow: hidden !important;
+}
+
+
+
+input[type="date"] {
+  pointer-events: auto !important;
+  -webkit-appearance: textfield;
+  /* evita eliminar comportamiento nativo */
+  appearance: auto;
+}
+
+/* Asegura que el indicador es clickeable */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  pointer-events: auto;
+}
+
+
+/*Hover para elementos*/
+
+
+.hoverElement:hover {
+background-color: #fbfbfb;
+}
+
+
+
+/*Deshabilita el hover de la tabla secundarya en dispositivos mobiles, la que se despliega*/
+/* Desactiva el sombreado en hover de DataTables */
+table.table.dataTable.table-hover > tbody > tr:hover > * {
+  box-shadow: inset 0 0 0 9999px rgba(var(--dt-row-hover), 0) !important;
+  color: white !important;
+}
+
+
+/*Para que las alertas no se metan debajo de modales*/
+#toast-container { z-index: 2000 !important; }
+@media (max-width: 576px){
+  #toast-container { top: auto !important; bottom: .75rem !important; }
+}
+
+/*Ajuste del tamaño del a alerta*/
+/* Anchura mayor para cada toast (reduce alto al envolver menos) */
+#toast-container > .toast {
+  width: 420px !important;
+}
+
+/* Un poco más ancho en pantallas medianas y grandes */
+@media (min-width: 768px) {
+  #toast-container > .toast {
+    width: 480px !important;
+  }
+}
+@media (min-width: 1200px) {
+  #toast-container > .toast {
+    width: 560px !important;
+  }
+}
+
+/* En móvil: ocupar casi todo el ancho sin overflow */
+@media (max-width: 575.98px) {
+  #toast-container > .toast {
+    width: calc(100vw - 2rem) !important;
+  }
+  /* Ajusta el contenedor para que respete el margen lateral */
+  #toast-container.toast-top-right,
+  #toast-container.toast-bottom-right { right: 1rem !important; }
+  #toast-container.toast-top-left,
+  #toast-container.toast-bottom-left { left: 1rem !important; }
+}

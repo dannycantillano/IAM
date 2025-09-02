@@ -93,7 +93,7 @@ export const OrdenServicioCard = ({
         <div className="d-flex flex-stack mb-3">
           <div className="text-active-inverse-white bg-active-white active">
             <span className="fs-4 mb-1 text-gray-700">
-            Orden #{orden.iD_OrdenServicio}
+             #{orden.iD_OrdenServicio}
           </span>
           </div>
           <FechaEntregaBadge
@@ -135,7 +135,7 @@ export const OrdenServicioCard = ({
         ))}
 
         <div className="separator my-3"></div>
-        <p className="text-gray-700 py-2 fw-bold">{orden.notaOrdenServicio}</p>
+        <p className="text-gray-700 py-2 fw-bold">{(orden?.notaOrdenServicio ?? "").replace(/\s*\|\s*$/, "") || "—"}</p>
 
         <div className="d-flex justify-content-between align-items-center w-100">
           <div className="d-flex align-items-center gap-3">

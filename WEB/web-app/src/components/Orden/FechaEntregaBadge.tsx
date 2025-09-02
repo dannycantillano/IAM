@@ -8,7 +8,7 @@ export const FechaEntregaBadge = ({
   /* ────────────────────────────
    * Validaciones iniciales
    * ──────────────────────────── */
-  if (!fechaEntrega || !fechaCreacion) return null;
+  if ((!fechaEntrega || !fechaCreacion) || fechaEntrega =="0001-01-01T00:00:00") return '---';
 
   const fEntrega =
     typeof fechaEntrega === "string" ? new Date(fechaEntrega) : fechaEntrega;

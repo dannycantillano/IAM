@@ -1,0 +1,8 @@
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+<script>
+  // Log de errores “duros”
+  window.addEventListener('error', e => console.error('WindowError:', e.error?.stack || e.message));
+  window.addEventListener('unhandledrejection', e => console.error('UnhandledRejection:', e.reason?.stack || e.reason));
+  console.log('UA=', navigator.userAgent);
+</script>

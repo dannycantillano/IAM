@@ -15,14 +15,16 @@ export const ROUTES = {
     HELP: "/help",
     TERMS: "/terms",
     PRIVACY: "/privacy",
-    NEGOCIO: "/negocio",
+    BUSINESS: "/business",
     MONITOR: "/monitor",
-    CUENTAS: "/cuentas",
-    CLIENTES: "/clientes",
+    ACCOUNTS: "/accounts",
+    CLIENTS: "/clients",
     TRANSACTIONS: "/transactions",
-    SERVICE_ORDER: "/orden-servicio", 
+    SERVICE_ORDER: "/service-order",
+    QUOTATION: "/quotation",
     INFO: "/info",
-    NOT_FOUND: "*", 
+    RATES: "/rates",
+    NOT_FOUND: "*",
 } as const;
 
 // Tipo para las claves de las rutas

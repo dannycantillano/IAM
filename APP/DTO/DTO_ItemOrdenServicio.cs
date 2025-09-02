@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 namespace DTO
 {
@@ -13,6 +14,7 @@ namespace DTO
         private string? descripcion;
         private decimal monto;
         private int? avance;  // Puede ser NULL, por lo que es de tipo nullable (int?)
+        private decimal cantidad;  // Puede ser NULL, por lo que es de tipo nullable (int?)
 
         #endregion
 
@@ -28,19 +30,39 @@ namespace DTO
             Descripcion = null;
             Monto = 0m;  // Valor predeterminado para DECIMAL
             Avance = null;  // Nullable, lo dejamos como null
+            Cantidad = 1;
         }
 
         #endregion
 
         #region Propiedades
 
-        public int ID_ItemOrdenServicio { get => id_ItemOrdenServicio; set => id_ItemOrdenServicio = value; }
-        public int ID_OrdenServicio { get => id_OrdenServicio; set => id_OrdenServicio = value; }
-        public string NombreItemOrdenServicio { get => nombreItemOrdenServicio; set => nombreItemOrdenServicio = value; }
-        public string? Descripcion { get => descripcion; set => descripcion = value; }
-        public decimal Monto { get => monto; set => monto = value; }
-        public int? Avance { get => avance; set => avance = value; }
-        public DTO_Estado Estado { get => estado; set => estado = value; }
+    
+
+
+        [JsonPropertyName("iD_ItemOrdenServicio")]
+        public int? ID_ItemOrdenServicio { get; set; }
+
+        [JsonPropertyName("iD_OrdenServicio")]
+        public int? ID_OrdenServicio { get; set; }
+
+        [JsonPropertyName("cantidad")]
+        public decimal? Cantidad { get; set; } = 1;
+
+        [JsonPropertyName("nombreItemOrdenServicio")]
+        public string? NombreItemOrdenServicio { get; set; } = string.Empty;
+
+        [JsonPropertyName("descripcion")]
+        public string? Descripcion { get; set; }
+
+        [JsonPropertyName("monto")]
+        public decimal? Monto { get; set; }
+
+        [JsonPropertyName("avance")]
+        public int? Avance { get; set; }
+
+        [JsonPropertyName("estado")]
+        public DTO_Estado? Estado { get; set; } = new();
 
         #endregion
     }

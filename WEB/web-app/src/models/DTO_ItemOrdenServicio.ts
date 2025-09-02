@@ -7,5 +7,6 @@ export class DTO_ItemOrdenServicio {
     nombreItemOrdenServicio: string = '';
     descripcion: string = '';
     monto: number = 0;
-    avance?: number = 0;
+    avance: number = 0;
+    cantidad: number = 1;
 }

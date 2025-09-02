@@ -1,5 +1,6 @@
 ﻿using DAL;
 using DTO;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,16 @@ namespace BLL
                     throw new Exception(respuesta.Mensaje);
 
             await _notificador.EnviarNotificacion(usuario, (DTO_ItemOrdenServicio) respuesta.Resultado[0]);
+
+            return respuesta;
+        }
+
+        public async Task<DTO_Respuesta> guardarItemsDesdeProforma([FromBody] List<DTO_ItemOrdenServicio> items)
+        {
+                respuesta  = await dAL_ItemOrdenServicio.guardarItemsDesdeProforma(items);
+
+                if (!respuesta.TipoRespuesta)
+                    throw new Exception(respuesta.Mensaje);
 
             return respuesta;
         }

@@ -1,10 +1,11 @@
 
-export type DynamicButtonConfig = {
+export type DynamicButtonConfig<T = any> = {
   titulo?: string;
   className?: string;
   icon?: React.ReactNode;
   disabled?: boolean;
-  onClick: (data?: any) => void;
+  onClick?: (data?: T) => void;
+  render?: (ctx: { row: T; index: number }) => React.ReactNode;
 };
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
 
 export const ModalHeaderButtons = ({
   buttons,
-  containerClassName = "ms-auto d-flex",
+  containerClassName = "ms-auto d-flex px-0 gap-2 py-2",
 }: Props) => {
   return (
     <div className={containerClassName}>
@@ -22,7 +23,7 @@ export const ModalHeaderButtons = ({
         <button
           key={`dynamic-btn-${index}`}
           onClick={btn.onClick}
-          className={`btn btn-sm me-2 ${
+          className={`btn btn-sm ${
             btn.className ? btn.className : "btn-primary"
           }`}
           disabled={btn.disabled}

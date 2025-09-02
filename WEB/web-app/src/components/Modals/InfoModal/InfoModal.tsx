@@ -3,11 +3,11 @@
 // Muestra valores formateados, con soporte para custom renderers.
 // -------------------------------------------------------------------------------------------------
 
-import React from "react";
+import { useEffect, useRef } from "react";
 import { dateHelpers } from "@/utils";
 import { FieldConfig } from "../GenericFormModal/types";
 import { DynamicButtonConfig, ModalHeaderButtons } from "@/components";
-
+import { useScrollLockSmart } from "@/hooks";
 
 
 interface InfoModalProps<T> {
@@ -18,6 +18,11 @@ interface InfoModalProps<T> {
   title?: string;
   headerButtons?: DynamicButtonConfig[];
 }
+
+
+
+
+
 
 /**
  * Formatea fechas válidas si están después del año 1753.
@@ -98,7 +103,7 @@ function renderValue<T>(
   if (value === null || value === undefined || value === "") {
    return (
      <span className="px-3 py-2 fs-7">
-       <i className="bi bi-info-circle me-1"></i>[No disponible]
+       ---
      </span>
    );
   }
@@ -117,6 +122,22 @@ export const InfoModal = <T,>({
   title = "Detalles",
   headerButtons,
 }: InfoModalProps<T>) => {
+
+//#region Scroll del body
+    //Ajustes para el croll del body, para bloquearlo en cuando se abren los modales
+const modalRef = useRef<HTMLDivElement>(null);
+
+ useScrollLockSmart(show, { rootRef: modalRef, fallbackSelector: ".app-scroll" });
+
+
+  useEffect(() => {
+    if (show) modalRef.current?.focus();
+  }, [show]);
+//#endregion Scroll del body
+
+
+
+
   if (!show) return null;
 
   const sortedFields = [...fields].sort(
@@ -127,8 +148,12 @@ export const InfoModal = <T,>({
 
   return (
     <div
-      className="modal fade show d-block shadowDarkBackground"
+      className="modal fade show d-block shadowClearBackground"
       onClick={onHide}
+      ref={modalRef}           
+      tabIndex={-1}  
+      role="dialog"          
+      aria-modal="true" 
     >
       <div
         className="modal-dialog modal-dialog-centered mw-750px"
@@ -136,30 +161,33 @@ export const InfoModal = <T,>({
       >
         <div className="modal-content card card-custom example example-compact">
           {/* Título */}
-          <div className="card-header">
-              <h3 className="card-title">{title}</h3>
-            <div className="card-toolbar">
-              {headerButtons && headerButtons.length > 0 && (
+          <div className="card-header px-5 py-lg-5">
+            <div className="col-11">
+            <h3 className="card-title">{title}</h3>
+            </div>
+            <div className="col-1">
+            <div className="card-toolbar justify-content-end">
+              <button type="button" className="btn-close" onClick={onHide} />
+              </div>
+            </div>
+
+                    {headerButtons && headerButtons.length > 0 && (
                 <ModalHeaderButtons buttons={headerButtons} />
               )}
-              <button type="button" className="btn-close" onClick={onHide} />
-            </div>
           </div>
 
           {/* Cuerpo */}
-          <div className="modal-body py-10 px-10 px-lg-17">
+          <div className="modal-body">
             <div className="row g-6">
               {sortedFields.map((field) => {
                 const value = data?.[field.key] ?? null;
                 return (
                   <div key={String(field.key)} className="col-12 col-md-6">
-                    <div className="bg-light border rounded p-4 shadow-sm h-100">
-                      <div className="text-muted fw-semibold fs-7 mb-1">
-                        {field.label}
+                    <div className="h-100">
+                      <div className="text-muted fs-5 mb-1">
+                        {field.label}: <span className="text-dark">{renderValue(field, value)}</span>
                       </div>
-                      <div className="fw-bold fs-6 text-gray-900">
-                        {renderValue(field, value)}
-                      </div>
+                
                     </div>
                   </div>
                 );

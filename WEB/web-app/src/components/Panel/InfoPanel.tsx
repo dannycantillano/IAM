@@ -21,7 +21,7 @@ export const InfoPanel = ({ msj }: InfoPanelProps) => {
 
           <div className="text-gray-400 fw-bold fs-7">
             ¿Aún no tiene un negocio registrado?{" "}
-            <Link to={ROUTES.NEGOCIO} className="link-primary fw-bolder">
+            <Link to={ROUTES.BUSINESS} className="link-primary fw-bolder">
               Registrar un Negocio
             </Link>
           </div>

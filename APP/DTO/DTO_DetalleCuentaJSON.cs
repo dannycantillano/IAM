@@ -9,7 +9,7 @@ namespace DTO
     public class DTO_DetalleCuentaJSON
     {
         #region Properties
-        public List<DTO_Param> Filas { get; set; } = new();
+        public List<DTO_Fila_Detalle> Filas { get; set; } = new();
         public DTO_Param Descuento { get; set; } = new();
         public DTO_Param Impuesto { get; set; } = new();
         #endregion

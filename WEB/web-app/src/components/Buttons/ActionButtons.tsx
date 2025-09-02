@@ -85,22 +85,38 @@ export const ActionButtons = ({
       </button>
 
       {dataTableButtons &&
-        dataTableButtons.map((btn, index) => (
-          <button
-            key={`data-table-btn-${index}`}
-            title={btn.titulo}
-            className={`btn btn-icon btn-bg-light btn-active-color-primary btn-sm ${
-              btn.className ? btn.className : ""
-            }`}
-            disabled={btn.disabled}
-            onClick={(e) => {
-              e.stopPropagation();
-              btn.onClick(rowData);
-            }}
-          >
-            {btn.icon}
-          </button>
-        ))}
+        dataTableButtons.map((btn, index) => {
+          // Si el botón provee "render", lo usamos (full control del UI)
+          if (btn.render) {
+            return (
+              <span
+                key={`data-table-btn-render-${index}`}
+                onClick={(e) => e.stopPropagation()} // evita seleccionar la fila
+                className="me-1"
+              >
+                {btn.render({ row: rowData, index })}
+              </span>
+            );
+          }
+
+          // Botón normal (como ya lo tenías)
+          return (
+            <button
+              key={`data-table-btn-${index}`}
+              title={btn.titulo}
+              className={`btn btn-icon btn-bg-light btn-active-color-primary btn-sm ${
+                btn.className ? btn.className : ""
+              }`}
+              disabled={btn.disabled}
+              onClick={(e) => {
+                e.stopPropagation();
+                btn.onClick?.(rowData);
+              }}
+            >
+              {btn.icon}
+            </button>
+          );
+        })}
     </div>
   );
 };

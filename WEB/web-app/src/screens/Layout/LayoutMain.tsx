@@ -8,6 +8,11 @@ import { useLogout } from "@/hooks/useLogout";
 import { BusinessButtons, ConfirmModal } from "@/components";
 import { AuthContext } from "@/context";
 
+//imagenes 
+import imgLogo6 from "@assets/media/logos/logo-6.svg";
+import imgLogo2 from "@assets/media/logos/logo-2.svg";
+import imgAvatar from "@assets/media/avatars/blank.png";
+
 declare global {
   interface Window {
     KTDrawer: { createInstances: () => void };
@@ -23,7 +28,7 @@ export const LayoutMain = () => {
     // Este useEffect habilita el sonido de la notificación previamente
     const habilitarSonido = () => {
       try {
-        const audioTemp = new Audio("../../assets/media/audios/Monitor.mp3");
+        const audioTemp = new Audio("@/assets/media/audios/Monitor.mp3");
         audioTemp.play().then(() => {
           audioTemp.pause();
           audioTemp.currentTime = 0;
@@ -117,7 +122,6 @@ export const LayoutMain = () => {
     popover.innerHTML = `
                     <div style="display:flex;align-items:center;">
                     <div>
-                      <span style="font-weight:500;">Próximamente</span><br/>
                       <span style="font-size:13px;">Esta opción estará disponible en <span style="font-weight:600; color:#0a1">próximas actualizaciones</span>.</span>
                     </div>
                     </div>
@@ -165,7 +169,7 @@ export const LayoutMain = () => {
             <img
               alt="Logo"
               className="h-45px logo"
-              src="src/assets/media/logos/logo-demo-6.svg"
+              src={imgLogo6}
             />
           </Link>
         </div>
@@ -203,61 +207,13 @@ export const LayoutMain = () => {
                 </Link>
               </div>
 
-              <div className="menu-item py-2">
-                {/* <Link
-                  to={ROUTES.CHAT_AI}
-                  className={`menu-link menu-center${
-                    pathname === ROUTES.CHAT_AI ? " active" : ""
-                  }`}
-                  data-bs-trigger="hover"
-                  data-bs-dismiss="click"
-                  data-bs-placement="right"
-                >
-                  <span className="menu-icon me-0">
-                    <i className="bi bi-chat-left fs-2" />
-                  </span>
-                  <span className="menu-title">Chat</span>
-                </Link> */}
-                <div
-                  className="menu-link menu-center disabled"
-                  style={{
-                    cursor: "not-allowed",
-                    opacity: 0.6,
-                    position: "relative",
-                  }}
-                  tabIndex={0}
-                  title="Próximamente"
-                  onClick={handlePopoverToChat}
-                >
-                  <span className="menu-icon me-0">
-                    <i className="bi bi-chat-left fs-2" />
-                  </span>
-                  <span className="menu-title">Chat</span>
-                </div>
-              </div>
+      
 
               <div className="menu-item py-2">
                 <Link
-                  to={ROUTES.NEGOCIO}
+                  to={ROUTES.CLIENTS}
                   className={`menu-link menu-center${
-                    pathname === ROUTES.NEGOCIO ? " active" : ""
-                  }`}
-                  data-bs-trigger="hover"
-                  data-bs-dismiss="click"
-                  data-bs-placement="right"
-                >
-                  <span className="menu-icon me-0">
-                    <i className="bi bi-briefcase fs-2" />
-                  </span>
-                  <span className="menu-title">Negocio</span>
-                </Link>
-              </div>
-
-              <div className="menu-item py-2">
-                <Link
-                  to={ROUTES.CLIENTES}
-                  className={`menu-link menu-center${
-                    pathname === ROUTES.CLIENTES ? " active" : ""
+                    pathname === ROUTES.CLIENTS ? " active" : ""
                   }`}
                   data-bs-trigger="hover"
                   data-bs-dismiss="click"
@@ -272,9 +228,9 @@ export const LayoutMain = () => {
 
               <div className="menu-item py-2">
                 <Link
-                  to={ROUTES.CUENTAS}
+                  to={ROUTES.ACCOUNTS}
                   className={`menu-link menu-center${
-                    pathname === ROUTES.CUENTAS ? " active" : ""
+                    pathname === ROUTES.ACCOUNTS ? " active" : ""
                   }`}
                   data-bs-trigger="hover"
                   data-bs-dismiss="click"
@@ -336,6 +292,96 @@ export const LayoutMain = () => {
                   </span>
                   <span className="menu-title">Transacciones</span>
                 </Link>
+              </div>
+
+                     
+
+              
+              <div className="menu-item py-2">
+                <Link
+                  to={ROUTES.RATES}
+                  className={`menu-link menu-center${
+                    pathname === ROUTES.RATES ? " active" : ""
+                  }`}
+                  data-bs-trigger="hover"
+                  data-bs-dismiss="click"
+                  data-bs-placement="right"
+                >
+                    <span className="menu-icon me-0">
+                    <i className="bi bi-currency-exchange fs-2" />
+                    </span>
+                  <span className="menu-title">Tarifario</span>
+                </Link>
+              </div>
+
+              <div className="menu-item py-2">
+                <Link
+                  to={ROUTES.QUOTATION}
+                  className={`menu-link menu-center${pathname === ROUTES.QUOTATION ? " active" : ""}`}
+                  data-bs-trigger="hover"
+                  data-bs-dismiss="click"
+                  data-bs-placement="right"
+                >
+                  <span className="menu-icon me-0">
+                    <i className="bi bi-file-earmark-text fs-2" />
+                  </span>
+                  <span className="menu-title">Proformas</span>
+                </Link>
+              </div>
+
+                  <div className="menu-item py-2">
+                <Link
+                  to={ROUTES.BUSINESS}
+                  className={`menu-link menu-center${
+                    pathname === ROUTES.BUSINESS ? " active" : ""
+                  }`}
+                  data-bs-trigger="hover"
+                  data-bs-dismiss="click"
+                  data-bs-placement="right"
+                >
+                  <span className="menu-icon me-0">
+                    <i className="bi bi-briefcase fs-2" />
+                  </span>
+                  <span className="menu-title">Negocio</span>
+                </Link>
+              </div>
+
+               <div className="menu-item py-2">
+                {/* <Link
+                  to={ROUTES.CHAT_AI}
+                  className={`menu-link menu-center${
+                    pathname === ROUTES.CHAT_AI ? " active" : ""
+                  }`}
+                  data-bs-trigger="hover"
+                  data-bs-dismiss="click"
+                  data-bs-placement="right"
+                >
+                  <span className="menu-icon me-0">
+                    <i className="bi bi-chat-left fs-2" />
+                  </span>
+                  <span className="menu-title">Chat</span>
+                </Link> */}
+
+                
+          
+
+                <div
+                  className="menu-link menu-center disabled"
+                  style={{
+                    cursor: "not-allowed",
+                    opacity: 0.6,
+                    position: "relative",
+                  }}
+                  tabIndex={0}
+                  title="Próximamente"
+                  onClick={handlePopoverToChat}
+                >
+                  <span className="menu-icon me-0">
+                    <i className="bi bi-chat-left fs-2" />
+                  </span>
+                  <span className="menu-title">IA</span>
+                </div>
+
               </div>
 
               <div className="menu-item py-2">
@@ -404,7 +450,7 @@ export const LayoutMain = () => {
                 <img
                   alt="Logo"
                   className="h-30px"
-                  src="src/assets/media/logos/logo-2.svg"
+                  src={imgLogo2}
                 />
               </Link>
             </div>
@@ -427,7 +473,7 @@ export const LayoutMain = () => {
                   data-kt-menu-placement="bottom-end"
                   data-kt-menu-flip="bottom"
                 >
-                  {/* <img src="src/assets/media/avatars/150-26.jpg" alt="metronic" /> */}
+             
                   <i className="bi bi-person-fill fs-1"></i>
                 </div>
 
@@ -448,8 +494,8 @@ export const LayoutMain = () => {
                       <div className="symbol symbol-50px me-5">
                         {/* {Aqui debe ir la foto del cliente usuario } */}
                         <img
-                          // src={user?.fotoUsuario || "src/assets/media/avatars/blank.png"}
-                          src={"src/assets/media/avatars/blank.png"}
+    
+                          src={imgAvatar}
                           alt="Foto de usuario"
                         />
                       </div>
@@ -516,7 +562,7 @@ export const LayoutMain = () => {
                 rel="noreferrer"
                 className="text-gray-800 text-hover-primary"
               >
-                V1.0.2
+                V1.0.5
               </a>
             </div>
           </div>

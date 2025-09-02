@@ -2,6 +2,8 @@ import { useGenericForm } from "@/hooks/useGenericForm";
 import { FieldConfig } from "./types";
 import { DynamicButtonConfig, ModalHeaderButtons } from "@/components";
 import { DTO_Param } from "@/models";
+import { useScrollLockSmart } from "@/hooks/useScrollLockSmart";
+import { useEffect, useRef } from "react";
 
 //#region INTERFACES
 interface GenericFormModalProps<T> {
@@ -15,7 +17,6 @@ interface GenericFormModalProps<T> {
   headerButtons?: DynamicButtonConfig[];
   erroresValidacion?: Array<DTO_Param>;
   onEliminarError: (key: string) => void;
-
 }
 //#endregion
 
@@ -30,14 +31,31 @@ export const GenericFormModal = <T,>({
   fields,
   headerButtons,
   erroresValidacion = [],
-  onEliminarError
+  onEliminarError,
 }: GenericFormModalProps<T>) => {
   //#region HOOKS
-  const {
-    localDisplay,
-    handleChange,
-    handleBlur,
-  } = useGenericForm(data, setData, fields, show, onSubmit);
+  const { localDisplay, handleChange, handleBlur } = useGenericForm(
+    data,
+    setData,
+    fields,
+    show,
+    onSubmit
+  );
+
+  //#region Scroll del body
+  //Ajustes para el croll del body, para bloquearlo en cuando se abren los modales
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useScrollLockSmart(show, {
+    rootRef: modalRef,
+    fallbackSelector: ".app-scroll",
+  });
+
+  useEffect(() => {
+    if (show) modalRef.current?.focus();
+  }, [show]);
+  //#endregion
+
   //#endregion
 
   if (!show) return null;
@@ -48,28 +66,28 @@ export const GenericFormModal = <T,>({
     const rawVal = (data as any)[key];
     const localVal = localDisplay[key];
 
-
-
-    const inputClass = 
-    type === "custom"  ?
-    (erroresValidacion.some(error => error.nombre === String(key)) ? " is-invalid-custom-select": "") :
-    (erroresValidacion.some(error => error.nombre === String(key)) ? `form-control ` + " is-invalid" : `form-control `);
+    const inputClass =
+      type === "custom"
+        ? erroresValidacion.some((error) => error.nombre === String(key))
+          ? " is-invalid-custom-select"
+          : ""
+        : erroresValidacion.some((error) => error.nombre === String(key))
+        ? `form-control ` + " is-invalid"
+        : `form-control `;
     const wrapperClass =
       type === "custom"
         ? idx < 2
-          ? "col-md-6 fv-row"
+          ? " fv-row"
           : "d-flex flex-column mb-5 fv-row"
         : type === "date"
-          ? "d-flex flex-column mb-5 fv-row"
-          : idx < 2
-            ? "col-md-6 fv-row"
-            : "d-flex flex-column mb-5 fv-row";
+        ? "d-flex flex-column mb-5 fv-row"
+        : idx < 2
+        ? " fv-row"
+        : "d-flex flex-column mb-5 fv-row";
 
     const labelClass =
       (field.required ? "required " : "") +
-      (idx < 2
-        ? "fs-5 fw-bold mb-2"
-        : "fs-5 fw-bold mb-2 mt-6");
+      (idx < 2 ? "fs-5 fw-bold mb-2" : "fs-5 fw-bold mb-2 mt-6");
 
     //#region READ-ONLY LABEL
     if (readOnly) {
@@ -122,23 +140,21 @@ export const GenericFormModal = <T,>({
             {renderer({
               value: rawVal,
               onChange: (val) => {
-                onEliminarError(key.toString())
+                onEliminarError(key.toString());
                 setData((prev) => ({ ...prev, [key]: val }));
               },
               //onBlur: () => handleBlur(key),
             })}
           </div>
 
-
           {/* sección de errores personalizados */}
           {erroresValidacion
-            .filter(error => error.nombre === String(key))
+            .filter((error) => error.nombre === String(key))
             .map((error, idx) => (
               <div key={idx} className="invalid-feedback d-block">
                 {error.valor}
               </div>
             ))}
-
         </div>
       );
     }
@@ -155,12 +171,16 @@ export const GenericFormModal = <T,>({
             id={String(key)}
             className={inputClass}
             value={String(rawVal ?? "")}
-            onChange={(e) => { onEliminarError(key.toString()); handleChange(key, e.target.value, "text") }}
+            rows={1}
+            onChange={(e) => {
+              onEliminarError(key.toString());
+              handleChange(key, e.target.value, "text");
+            }}
             onBlur={() => handleBlur(key)}
           />
           {/* sección de errores personalizados */}
           {erroresValidacion
-            .filter(error => error.nombre === String(key))
+            .filter((error) => error.nombre === String(key))
             .map((error, idx) => (
               <div key={idx} className="invalid-feedback d-block">
                 {error.valor}
@@ -182,9 +202,11 @@ export const GenericFormModal = <T,>({
             id={String(key)}
             className={inputClass}
             value={String(rawVal ?? "")}
-            onChange={(e) => { onEliminarError(key.toString()); handleChange(key, e.target.value, "select") }}
+            onChange={(e) => {
+              onEliminarError(key.toString());
+              handleChange(key, e.target.value, "select");
+            }}
             onBlur={() => handleBlur(key)}
-            
           >
             <option value="">– Seleccione –</option>
             {options?.map((opt) => (
@@ -195,7 +217,7 @@ export const GenericFormModal = <T,>({
           </select>
           {/* sección de errores personalizados */}
           {erroresValidacion
-            .filter(error => error.nombre === String(key))
+            .filter((error) => error.nombre === String(key))
             .map((error, idx) => (
               <div key={idx} className="invalid-feedback d-block">
                 {error.valor}
@@ -224,14 +246,18 @@ export const GenericFormModal = <T,>({
           <input
             id={String(key)}
             type="date"
+            placeholder="dd/mm/aaaa"
             className={inputClass}
             value={dateVal}
-            onChange={(e) => { onEliminarError(key.toString()); handleChange(key, e.target.value, "date") }}
+            onChange={(e) => {
+              onEliminarError(key.toString());
+              handleChange(key, e.target.value, "date");
+            }}
             onBlur={() => handleBlur(key)}
           />
           {/* sección de errores personalizados */}
           {erroresValidacion
-            .filter(error => error.nombre === String(key))
+            .filter((error) => error.nombre === String(key))
             .map((error, idx) => (
               <div key={idx} className="invalid-feedback d-block">
                 {error.valor}
@@ -257,12 +283,15 @@ export const GenericFormModal = <T,>({
               ? String(localVal ?? rawVal ?? "")
               : String(rawVal ?? "")
           }
-          onChange={(e) => { onEliminarError(key.toString()); handleChange(key, e.target.value, type) }}
+          onChange={(e) => {
+            onEliminarError(key.toString());
+            handleChange(key, e.target.value, type);
+          }}
           onBlur={() => handleBlur(key)}
         />
         {/* sección de errores personalizados */}
         {erroresValidacion
-          .filter(error => error.nombre === String(key))
+          .filter((error) => error.nombre === String(key))
           .map((error, idx) => (
             <div key={idx} className="invalid-feedback d-block">
               {error.valor}
@@ -277,22 +306,31 @@ export const GenericFormModal = <T,>({
   //#region RENDER MODAL
   return (
     <div
-      className="modal fade show d-block shadowDarkBackground"
+      className="modal fade show d-block shadowDarkBackground p2"
       onClick={onHide}
+      ref={modalRef}
+      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
     >
       <div
         className="modal-dialog modal-dialog-centered modal-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-content card card-custom example example-compact">
-          <div className="card-header">
-            <h3 className="card-title">{title}</h3>
-            <div className="card-toolbar">
-              {headerButtons && headerButtons.length > 0 && (
-                <ModalHeaderButtons buttons={headerButtons} />
-              )}
-              <button type="button" className="btn-close" onClick={onHide} />
+          <div className="card-header px-5 py-lg-5">
+            <div className="col-11">
+              <h3 className="card-title">{title}</h3>
             </div>
+            <div className="col-1">
+              <div className="card-toolbar justify-content-end">
+                <button type="button" className="btn-close" onClick={onHide} />
+              </div>
+            </div>
+
+            {headerButtons && headerButtons.length > 0 && (
+              <ModalHeaderButtons buttons={headerButtons} />
+            )}
           </div>
 
           <form
@@ -302,26 +340,26 @@ export const GenericFormModal = <T,>({
             }}
             className="form"
           >
-            <div className="card-body">
+            <div className="card-body p-4 row">
               {[...fields]
                 .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
                 .map((field, idx) => (
-                  <div key={String(field.key)} className="col-12 mb-4">
+                  <div key={String(field.key)} className="col-md-6 mb-2">
                     {renderField(field, idx)}
                   </div>
                 ))}
             </div>
 
-            <div className="card-footer">
-              <button type="submit" className="btn btn-primary me-3">
-                Guardar
-              </button>
+            <div className="card-footer d-flex justify-content-end gap-2 px-4">
               <button
                 type="button"
                 className="btn btn-secondary"
                 onClick={onHide}
               >
                 Cancelar
+              </button>
+              <button type="submit" className="btn btn-primary">
+                Guardar
               </button>
             </div>
           </form>

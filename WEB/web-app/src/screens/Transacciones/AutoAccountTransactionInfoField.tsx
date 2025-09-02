@@ -24,10 +24,10 @@ export const AutoAccountTransactionInfoField = ({ field, editData }: props) => {
       />
       <i
         ref={infoIconRef}
-        className="bi bi-info-circle-fill text-info"
+        className="bi bi-info-circle-fill"
         data-bs-toggle="tooltip"
         data-bs-placement="top"
-        title="Esta es una transacción creada automáticamente desde una cuenta. Para modificarla, elimínela y créela manualmente."
+        title="Campo no editable ya que esta es una transacción creada automáticamente desde una cuenta"
       />
     </div>
   );

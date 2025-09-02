@@ -12,6 +12,7 @@ namespace API.Controllers
 
     namespace API.Controllers
     {
+        [ApiController]
         [Route("api/[controller]")]
         public class ItemOrdenServicioController : ControllerBase
         {
@@ -35,6 +36,26 @@ namespace API.Controllers
                 try
                 {
                     respuesta = await _bLL_ItemOrdenServicio.guardarItemOrdenServicio(itemOrdenServicio, UTL_SesionHelper.obtenerUsuarioSesion(User.Claims));
+                }
+                catch (Exception ex)
+                {
+                    respuesta = manejoError.errorNoControlado(ex);
+                }
+
+                return respuesta;
+            }
+
+
+            // Endpoint para guardar un ítem de orden de servicio
+            [Authorize(Roles = "1")]
+            [Produces("application/json")]
+            [Route("guardarItemsDeProf")]
+            [HttpPost]
+            public async Task<DTO_Respuesta> guardarItemsDeProf([FromBody] List<DTO_ItemOrdenServicio> itemOrdenServicio)
+            {
+                try
+                {
+                    respuesta = await _bLL_ItemOrdenServicio.guardarItemsDesdeProforma(itemOrdenServicio);
                 }
                 catch (Exception ex)
                 {

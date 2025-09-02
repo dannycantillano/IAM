@@ -23,7 +23,7 @@ namespace API.Controllers
         [Route("buscarClientes")]
         [HttpPost]
 
-        public async Task<IActionResult> BuscarClientes([FromBody] DTO_SolicitudDeBusquedaDeCliente solicitud)
+        public async Task<IActionResult> BuscarClientes([FromBody] DTO_SolicitudDeBusqueda solicitud)
         {
 
             usuario.ID_Usuario = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);

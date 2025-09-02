@@ -26,7 +26,7 @@ namespace BLL
             return respuesta;
         }
 
-        public async Task<List<DTO_Cliente>> BuscarClientesAsync(DTO_SolicitudDeBusquedaDeCliente solicitud, DTO_Usuario usuario)
+        public async Task<List<DTO_Cliente>> BuscarClientesAsync(DTO_SolicitudDeBusqueda solicitud, DTO_Usuario usuario)
         {
             // Removed unnecessary assignment to 'lista'
             return await dAL_Cliente.BuscarClientesAsync(solicitud, usuario);

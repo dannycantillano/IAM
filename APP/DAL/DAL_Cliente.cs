@@ -84,7 +84,7 @@ namespace DAL
 
         //Este metode es para buscar los cliente existentes y mostrarlos en u select en frontEnd
         //NO se ocupa EL DTO_Respuesta para un componente tipo type-ahead que solo necesita una lista de clientes, ese sobre-envoltorio suele ser contraproducente
-        public async Task<List<DTO_Cliente>> BuscarClientesAsync(DTO_SolicitudDeBusquedaDeCliente solicitud, DTO_Usuario usuario)
+        public async Task<List<DTO_Cliente>> BuscarClientesAsync(DTO_SolicitudDeBusqueda solicitud, DTO_Usuario usuario)
         {
 
             var lista = new List<DTO_Cliente>();

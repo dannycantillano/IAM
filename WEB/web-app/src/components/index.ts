@@ -26,3 +26,6 @@ export * from "./Tables/DataTable/GenericDataTable";
 export * from "./DetalleCuentaInput/DetalleCuentaInput";
 export * from "./FinancialSummaryCard/FinancialSummaryCard";
 export * from "./Metrica/KPI";
+export * from "./AsyncTarifaSelect/AsyncTarifaSelect";
+export * from "./AsyncProformaSelect/AsyncProformaSelect";
+export * from "./Modals/ProformaCrearEditarModal/ProformaCrearEditarModal";

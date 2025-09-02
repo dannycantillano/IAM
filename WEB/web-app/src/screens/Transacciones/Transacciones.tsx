@@ -1,11 +1,13 @@
 // ✅ RP-19: Pantalla Transacciones adaptada a estructura definitiva (estado local, sin refetch completo, edición con lógica de cuentas)
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DTO_Negocio, DTO_Transacciones, DTO_Respuesta, DTO_Param } from "@/models";
+
 import {
   ConfirmModal,
   FieldConfig,
   GenericDataTable,
+  GenericDataTableHandle,
   GenericFormModal,
   InfoModal,
   InfoPanel,
@@ -18,6 +20,7 @@ import {
   transaccionesFormEditFields,
   keysInfoModalTransacciones,
   formatColones,
+  compararObjetos,
 } from "@/utils";
 import { errorHelpers, notificationHelpers, procesarRespuesta } from "@/utils";
 import { STATUS_TBL } from "@/constants";
@@ -27,6 +30,7 @@ import { AutoAccountTransactionInfoField } from "./AutoAccountTransactionInfoFie
 import { valida_DTO_Transacciones } from "@/validators/valida_DTO_Transacciones";
 
 export const Transacciones = () => {
+  const tableRef = useRef<GenericDataTableHandle<DTO_Transacciones>>(null);
   // #region Validaciones en los formularios
   const [erroresValidacion, setErroresValidacion] = useState<DTO_Param[]>([]);
   let validacion: Array<DTO_Param>;
@@ -139,6 +143,7 @@ export const Transacciones = () => {
           // ✅ Filtramos si no es eliminado antes de agregar
           if (nueva.estado?.iD_Estado !== STATUS_TBL.TRANSACTION.DELETED) {
             setTransacciones((prev) => [nueva, ...prev]);
+            tableRef.current?.upsert(nueva);
           }
           notificationHelpers.successAlert(result.mensaje);
           setIsModalFormOpen(false);
@@ -153,7 +158,10 @@ export const Transacciones = () => {
   const handleCancelAdd = () => {
     setConfirmModalMessage("¿Deseas cancelar el registro de la transacción?");
     setConfirmContext("cancelAdd");
-    setIsConfirmOpen(true);
+    if(!compararObjetos(formData as DTO_Transacciones, new DTO_Transacciones, ["fechaTransaccion"]))
+      setIsConfirmOpen(true);
+    else
+      setIsModalFormOpen(false);
   };
   //#endregion
 
@@ -172,34 +180,35 @@ export const Transacciones = () => {
     if (!updatedData.estado?.iD_Estado && rowEditSelected.estado?.iD_Estado) {
       updatedData.estado = { ...rowEditSelected.estado };
     }
-    validacion = valida_DTO_Transacciones.validar(formData, "U");
+    validacion = valida_DTO_Transacciones.validar(updatedData, "U");
     setErroresValidacion(validacion)
     if (validacion.length === 0) {
-    transaccionesService.actualizarTransaccion(updatedData).subscribe({
-      next: () => {
-        // ✅ Si sigue activo, actualizar; si fue eliminado, eliminar de lista
-        setTransacciones((prev) =>
-          updatedData.estado?.iD_Estado !== STATUS_TBL.TRANSACTION.DELETED
-            ? prev.map((t) =>
-              t.iD_Transaccion === updatedData.iD_Transaccion
-                ? updatedData
-                : t
-            )
-            : prev.filter(
-              (t) => t.iD_Transaccion !== updatedData.iD_Transaccion
-            )
-        );
-        notificationHelpers.successAlert(
-          "Transacción actualizada correctamente"
-        );
-        setShowEditModal(false);
-      },
-      error: errorHelpers.serverError,
-    });
-      } else {
+      transaccionesService.actualizarTransaccion(updatedData).subscribe({
+        next: () => {
+          // ✅ Si sigue activo, actualizar; si fue eliminado, eliminar de lista
+          setTransacciones((prev) =>
+            updatedData.estado?.iD_Estado !== STATUS_TBL.TRANSACTION.DELETED
+              ? prev.map((t) =>
+                t.iD_Transaccion === updatedData.iD_Transaccion
+                  ? updatedData
+                  : t
+              )
+              : prev.filter(
+                (t) => t.iD_Transaccion !== updatedData.iD_Transaccion
+              )
+          );
+          tableRef.current?.upsert(updatedData);
+          notificationHelpers.successAlert(
+            "Transacción actualizada correctamente"
+          );
+          setShowEditModal(false);
+        },
+        error: errorHelpers.serverError,
+      });
+    } else {
       notificationHelpers.warningAlert("Por favor valida los datos ingresados nuevamente");
     }
-	
+
   };
   //#endregion
 
@@ -225,7 +234,10 @@ export const Transacciones = () => {
         prev.filter((t) => t.iD_Transaccion !== updated.iD_Transaccion)
       );
       transaccionesService.actualizarTransaccion(updated).subscribe({
-        next: () => notificationHelpers.infoAlert("Transacción eliminada"),
+        next: () => {
+          notificationHelpers.infoAlert("Transacción eliminada")
+        tableRef.current?.removeById(updated.iD_Transaccion);
+        },
         error: errorHelpers.serverError,
       });
     }
@@ -251,11 +263,10 @@ export const Transacciones = () => {
 
   const editFormFields: FieldConfig<DTO_Transacciones>[] =
     transaccionesFormEditFields.map((field) => {
-      const esCuenta =
-        editData?.tipoNumReferencia?.trim().toLowerCase() === "cuenta";
+      const esCuenta = editData?.tipoNumReferencia?.trim().toLowerCase() === "cuenta";
       if (
         esCuenta &&
-        (field.key === "tipoNumReferencia" || field.key === "numReferencia")
+        (field.key === "tipoNumReferencia" || field.key === "numReferencia" || field.key === "tipo")
       ) {
         return {
           ...field,
@@ -289,7 +300,7 @@ export const Transacciones = () => {
       type: "custom",
       order: 9,
       renderer: ({ value }) => (
-        <div className="border border-gray-200 rounded px-4 py-3 d-flex align-items-center justify-content-between shadow-sm">
+        <div className="border border-gray-200 px-4 py-3 d-flex align-items-center justify-content-between">
           <i className="bi bi-cash-coin fs-4 text-gray-600 me-3"></i>
           <span className="fw-semibold fs-5 text-gray-800"></span>
           {formatColones(Number(value) || 0)}
@@ -308,19 +319,24 @@ export const Transacciones = () => {
         <LoadingPanel msj="Cargando transacciones..." />
       ) : selectedBusiness ? (
         <GenericDataTable<DTO_Transacciones>
+          ref={tableRef}
           title="Transacciones"
           columnKeys={columnKeysTransacciones}
           labelMap={labelMapTransacciones}
           data={transacciones.filter(
             (t) => t.estado?.iD_Estado !== STATUS_TBL.TRANSACTION.DELETED
           )}
+          independent              
+          idField="iD_Transaccion" 
           onAdd={handleAddNew}
           onEdit={handleEdit}
           onDelete={handleDelete}
           disableButtonAdd={disableButtonAdd}
           onRowClick={(row) => setRowTableSelected(row)}
-          includeEstadoColumn
+          includeEstadoColumn={false}
           customRenderers={customRenderers}
+          nowrapColumns={['Monto', 'ID']}
+
         />
       ) : (
         <InfoPanel msj="Selecciona un negocio para ver sus transacciones." />

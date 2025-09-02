@@ -17,6 +17,13 @@
         private int? iD_OrdenServicio;
         public DTO_DetalleCuentaJSON detalleJSON;
 
+
+        //Campos Calculados
+        private decimal montoAbonado;
+        private decimal saldoPendiente;
+        private string estadoPago;
+
+
         #endregion
 
         #region Constructor
@@ -35,6 +42,11 @@
             TipoCuenta = string.Empty;
             ID_OrdenServicio = null;
             DetalleJSON = new();
+
+            //Campos Calculados
+            MontoAbonado = 0;
+            SaldoPendiente = 0;
+            EstadoPago = string.Empty;
         }
 
         #endregion
@@ -117,6 +129,11 @@
             get => detalleJSON;
             set => detalleJSON = value ?? throw new ArgumentNullException(nameof(DetalleJSON));
         }
+
+        //Campos calculados
+        public decimal MontoAbonado { get => montoAbonado; set => montoAbonado = value; }
+        public decimal SaldoPendiente { get => saldoPendiente; set => saldoPendiente = value; }
+        public string EstadoPago { get => estadoPago; set => estadoPago = value; }
 
         #endregion
     }

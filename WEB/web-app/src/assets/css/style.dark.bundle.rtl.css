@@ -2233,7 +2233,7 @@ progress {
   --bs-table-bg: transparent;
   --bs-table-accent-bg: transparent;
   --bs-table-striped-color: #FFFFFF;
-  --bs-table-striped-bg: rgba(27, 27, 41, 0.75);
+/*cebratabla*/
   --bs-table-active-color: #FFFFFF;
   --bs-table-active-bg: #1b1b29;
   --bs-table-hover-color: #FFFFFF;
@@ -2296,7 +2296,7 @@ progress {
 
 .table-primary {
   --bs-table-bg: #d7ebff;
-  --bs-table-striped-bg: #ccdff2;
+/*cebratabla*/
   --bs-table-striped-color: #000000;
   --bs-table-active-bg: #c2d4e6;
   --bs-table-active-color: #000000;
@@ -2308,7 +2308,7 @@ progress {
 
 .table-secondary {
   --bs-table-bg: #d6d6da;
-  --bs-table-striped-bg: #cbcbcf;
+/*cebratabla*/
   --bs-table-striped-color: #000000;
   --bs-table-active-bg: #c1c1c4;
   --bs-table-active-color: #000000;
@@ -2320,7 +2320,7 @@ progress {
 
 .table-success {
   --bs-table-bg: #cef1e6;
-  --bs-table-striped-bg: #c4e5db;
+/*cebratabla*/
   --bs-table-striped-color: #000000;
   --bs-table-active-bg: #b9d9cf;
   --bs-table-active-color: #000000;
@@ -2332,7 +2332,7 @@ progress {
 
 .table-info {
   --bs-table-bg: #e7dcfe;
-  --bs-table-striped-bg: #dbd1f1;
+/*cebratabla*/
   --bs-table-striped-color: #000000;
   --bs-table-active-bg: #d0c6e5;
   --bs-table-active-color: #000000;
@@ -2344,7 +2344,7 @@ progress {
 
 .table-warning {
   --bs-table-bg: #ffeecc;
-  --bs-table-striped-bg: #f2e2c2;
+/*cebratabla*/
   --bs-table-striped-color: #000000;
   --bs-table-active-bg: #e6d6b8;
   --bs-table-active-color: #000000;
@@ -2356,7 +2356,7 @@ progress {
 
 .table-danger {
   --bs-table-bg: #fddcdf;
-  --bs-table-striped-bg: #f0d1d4;
+/*cebratabla*/
   --bs-table-striped-color: #000000;
   --bs-table-active-bg: #e4c6c9;
   --bs-table-active-color: #000000;
@@ -2368,7 +2368,7 @@ progress {
 
 .table-light {
   --bs-table-bg: #1b1b29;
-  --bs-table-striped-bg: #262634;
+/*cebratabla*/
   --bs-table-striped-color: #ffffff;
   --bs-table-active-bg: #32323e;
   --bs-table-active-color: #ffffff;
@@ -2380,7 +2380,7 @@ progress {
 
 .table-dark {
   --bs-table-bg: #FFFFFF;
-  --bs-table-striped-bg: #f2f2f2;
+/*cebratabla*/
   --bs-table-striped-color: #000000;
   --bs-table-active-bg: #e6e6e6;
   --bs-table-active-color: #000000;
@@ -5117,8 +5117,8 @@ textarea.form-control-lg {
 }
 .page-item.active .page-link {
   z-index: 3;
-  color: #FFFFFF;
-  background-color: #3699FF;
+  color: #398bc2;
+  background-color: #F1FAFF;
   border-color: transparent;
 }
 .page-item.disabled .page-link {
@@ -49025,7 +49025,7 @@ body.swal2-height-auto {
   border: 0 !important;
   background-color: #1b1b29;
   color: #92929F;
-  opacity: 0.75 !important;
+  opacity: 1 !important;
   padding: 1.25rem 4.5rem 1.25rem 1.25rem !important;
 }
 .toast:hover {

@@ -1,4 +1,8 @@
 //#region updateItemById: Actualiza o agrega un elemento en una lista por su id
+
+import { DTO_DetalleCuentaJSON } from "@/models";
+import { Console } from "console";
+
 /**
  * Actualiza un elemento en la lista si existe, comparando por la clave idKey.
  * Si no existe, agrega el elemento actualizado al final de la lista.
@@ -46,6 +50,20 @@ export function parametrosAString(
 }
 //#endregion
 
+export function compararObjetos<T extends object>(a: T, b: T, omitKeys: (keyof T)[]) {
+    const strip = (o: any): any =>
+        o && typeof o === 'object'
+            ? Array.isArray(o)
+                ? o.map(strip)
+                : Object.fromEntries(
+                    Object.entries(o)
+                        .filter(([k]) => !(omitKeys as string[]).includes(k))
+                        .map(([k, v]) => [k, strip(v)])
+                )
+            : o;
+
+    return JSON.stringify(strip(a)) === JSON.stringify(strip(b));
+}
 
 //#region formatColones: Formatea un valor numérico como colones costarricenses
 /**
@@ -79,6 +97,12 @@ export function formatDetalleJSON(
     detalle: any,
     type: "display" | "export" | "filter" | "sort" = "display"
 ): string {
+
+    
+    if (detalle?.filas.length == 0 && detalle?.impuesto?.valor == 0 && detalle?.descuento?.valor == 0) {
+        return ""
+    }
+
     const filas = detalle?.filas ?? [];
     const desc = detalle?.descuento?.valor ?? "0";
     const tipoDesc = detalle?.descuento?.nombre ?? "Monto";
@@ -92,15 +116,15 @@ export function formatDetalleJSON(
             : `Desc: ${Number(desc)}%`;
 
     const impStr = `Imp: ${Number(imp)}%`;
-    let filasStr = "Filas: ";
+    let filasStr = "";
     if (filas.length === 0) {
         filasStr += "0";
     } else {
         const mapped = filas.map(
             (f: any) =>
-            `<strong>${f.nombre}</strong>: <span style="color:green;">₡${Number(f.valor).toLocaleString("es-CR", {
-                minimumFractionDigits: 2,
-            })}</span>`
+                `${f.nombre}: <span style="color:green;">₡${Number(f.valor).toLocaleString("es-CR", {
+                    minimumFractionDigits: 2,
+                })}</span>`
         );
         filasStr += mapped.join(", ");
     }
@@ -109,9 +133,10 @@ export function formatDetalleJSON(
         return `${descStr}, ${impStr}, ${filasStr}`;
     }
 
+
     // Adaptación para usar correctamente el truncate de Bootstrap
     return `
-    <div class="row">
+    <div class="row dt-hover-invert">
       <div class="col-auto">
         <span class="d-inline-block text-truncate bg-primary-subtle text-dark px-2 py-1 w-100" style="max-width: 100vw;">${descStr}</span>
       </div>

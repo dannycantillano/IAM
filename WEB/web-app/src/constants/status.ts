@@ -58,6 +58,23 @@ export const STATUS_TBL = {
         PENDING: 0,
         COMPLETED: 0,
     },
+    TARIFF: {
+        ACTIVE: 23,
+        INACTIVE: 24,
+        DELETED: 25,
+    },
+    PROFORMA: {
+        DRAFT: 26, //borrador
+        APPROVED: 27,
+        ANNULLED: 28, //anulado
+        DELETED: 31,
+    },
+    PROFORMA_ITEM: {
+        ACTIVE: 29,
+        DELETED: 30,
+    },
+
+
 }
 
 export const FILTER_STATUS = {

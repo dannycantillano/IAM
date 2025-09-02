@@ -1,7 +1,37 @@
+// notificationHelpers.ts
+
+// (Opcional) Si quieres evitar errores de TS por el toastr global de tu plantilla,
+// puedes declarar el símbolo global una vez y seguir usando tus @ts-expect-error.
+// declare const toastr: any;
+
 export class notificationHelpers {
 
+    // 🔹 Init estático: se ejecuta una sola vez al cargar el módulo/clase.
+    static {
+        try {
+     
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": true,
+                "showDuration": 300,
+                "hideDuration": 0,
+                "timeOut": 3000,
+                //"onclick": null,
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+                
+            };
+        } catch { /* no-op si aún no está disponible */ }
+    }
+
     constructor() {
-        // @ts-expect-error — Se importa en el index al ser una funcionabilidad ya integrada de la plantilla
+        // ✔ Dejamos tu constructor intacto (por compatibilidad si en algún sitio haces `new notificationHelpers()`)
         toastr.options = {
             "closeButton": true,
             "debug": false,
@@ -9,34 +39,31 @@ export class notificationHelpers {
             "progressBar": true,
             "positionClass": "toast-top-right",
             "preventDuplicates": true,
-            "showDuration": "300",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "onclick": null,
-            "extendedTimeOut": "1000",
+            "showDuration": 300,
+            "hideDuration": 0,
+            "timeOut": 3000,
+            //"onclick": null,
             "showEasing": "swing",
             "hideEasing": "linear",
             "showMethod": "fadeIn",
             "hideMethod": "fadeOut"
         };
-
     }
 
     static errorAlert(mensaje: string) {
-        // @ts-expect-error - Función nativa
+
         toastr.error(mensaje, "Error");
     }
     static infoAlert(mensaje: string) {
-        // @ts-expect-error - Función nativa
+
         toastr.info(mensaje, "Información");
     }
     static warningAlert(mensaje: string) {
-        // @ts-expect-error - Función nativa
+
         toastr.warning(mensaje, "Advertencia");
     }
     static successAlert(mensaje: string) {
-        // @ts-expect-error - Función nativa
+
         toastr.success(mensaje, "Correcto");
     }
-
 }

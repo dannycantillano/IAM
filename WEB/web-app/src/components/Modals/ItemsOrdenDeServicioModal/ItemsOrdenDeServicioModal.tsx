@@ -1,6 +1,6 @@
 // ✅ RP-06: ItemsOrdenDeServicioModal adaptado con manejo local sin refetch y estructura organizada
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { GenericDataTable } from "@/components/Tables/DataTable/GenericDataTable";
 import { LoadingPanel } from "@/components/Panel/LoadingPanel";
 import { CustomRange } from "@/components/Range/CustomRange";
@@ -14,42 +14,67 @@ import {
   updateItemById,
   formatColones,
 } from "@/utils";
-import { itemsOrdenesService } from "@/services";
+import { items_proformaService, itemsOrdenesService } from "@/services";
 import { STATUS_TBL } from "@/constants";
-import { DTO_ItemOrdenServicio, DTO_Param, DTO_Respuesta } from "@/models";
+import { DTO_Cliente, DTO_ItemOrdenServicio, DTO_Negocio, DTO_Param, DTO_Proforma, DTO_ProformaItem, DTO_Respuesta } from "@/models";
 import {
+  AsyncProformaSelect,
+  AsyncTarifaSelect,
   ConfirmModal,
   FieldConfig,
   GenericFormModal,
   InfoModal,
+  ProformaOption,
+  TarifarioOption,
 } from "@/components";
 import { valida_DTO_ItemOrdenServicio } from "@/validators/valida_DTO_ItemOrdenServicio";
+import { useScrollLockSmart } from "@/hooks";
 
 interface ItemsOrdenDeServicioModalProps {
   open: boolean;
   onHide: () => void;
   title?: string;
   rowData: Record<string, any>;
+  negocio: DTO_Negocio;
 }
 
 export const ItemsOrdenDeServicioModal = ({
   open,
   onHide,
-  title = "Detalle del Ítem",
+  title = "Lista de ítems",
   rowData,
+  negocio,
 }: ItemsOrdenDeServicioModalProps) => {
+  //#region Scroll del body
+  //Ajustes para el croll del body, para bloquearlo en cuando se abren los modales
+  const modalRef = useRef<HTMLDivElement>(null);
+  const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
+
+  useScrollLockSmart(open, {
+    rootRef: modalRef,
+    fallbackSelector: ".app-scroll",
+  });
+
+  useEffect(() => {
+    if (open) modalRef.current?.focus();
+  }, [open]);
+  //#endregion Scroll del body
 
   // #region Validaciones en los formularios
   const [erroresValidacion, setErroresValidacion] = useState<DTO_Param[]>([]);
   let validacion: Array<DTO_Param>;
   const eliminarError = (campo: string) => {
-    setErroresValidacion(prev => prev.filter(e => e.nombre !== campo));
+    setErroresValidacion((prev) => prev.filter((e) => e.nombre !== campo));
   };
   // #endregion
 
   //#region 🔄 Estados generales
   const [itemsOrdenes, setItemsOrdenes] = useState<DTO_ItemOrdenServicio[]>([]);
+  const [itemsProformas, setItemsProformas] = useState<DTO_ItemOrdenServicio[]>([]);
   const [loading, setLoading] = useState(false);
+  const [tarifaSeleccionada, setTarifaSeleccionada] = useState<TarifarioOption | null>(null);
+  const [proformaSeleccionada, setProformaSeleccionada] = useState<ProformaOption | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
   //#endregion
 
   //#region ℹ️ info Modal estados;
@@ -62,6 +87,9 @@ export const ItemsOrdenDeServicioModal = ({
   const [isModalFormOpen, setIsModalFormOpen] = useState(false);
   const [formData, setFormData] = useState<DTO_ItemOrdenServicio>(
     new DTO_ItemOrdenServicio()
+  );
+  const [buscarProforma, setBuscarProforma] = useState<DTO_Proforma>(
+    new DTO_Proforma()
   );
   //#endregion
 
@@ -112,10 +140,23 @@ export const ItemsOrdenDeServicioModal = ({
   }, [open, rowData]);
   //#endregion
 
+
+
+  const handleDeleteItemProforma = (id: any) => {
+    setItemsProformas((prevItems) => prevItems.filter((item) => item.iD_ItemOrdenServicio !== id));
+  };
+
+
   //#region 🧩 Agregar nuevo
   const handleAddNew = () => {
-    setFormData(new DTO_ItemOrdenServicio());
-    setIsModalFormOpen(true);
+    if (rowData.estado.iD_Estado == 22) {
+      notificationHelpers.infoAlert("Orden archivada, no se pueden crear nuevos ítems");
+    } else {
+      setFormData(new DTO_ItemOrdenServicio());
+      setIsModalFormOpen(true);
+    }
+
+
   };
 
   const handleSave = () => {
@@ -127,7 +168,7 @@ export const ItemsOrdenDeServicioModal = ({
     };
 
     validacion = valida_DTO_ItemOrdenServicio.validar(formData, "C");
-    setErroresValidacion(validacion)
+    setErroresValidacion(validacion);
     if (validacion.length === 0) {
       itemsOrdenesService.registrarItemsOrdensDeServicio(formData).subscribe({
         next: (result: DTO_Respuesta) => {
@@ -139,8 +180,34 @@ export const ItemsOrdenDeServicioModal = ({
         error: errorHelpers.serverError,
       });
     } else {
-      notificationHelpers.warningAlert("Por favor valida los datos ingresados nuevamente");
+      notificationHelpers.warningAlert(
+        "Por favor valida los datos ingresados nuevamente"
+      );
     }
+  };
+
+
+  const handleProformaOnchange = (proforma: DTO_Proforma) => {
+    items_proformaService.obtenerItemsProformas(proforma).subscribe({
+      next: (result: DTO_Respuesta) => {
+        const itemsProformas = (result.resultado[0] as DTO_ProformaItem[]);
+
+        itemsProformas.forEach(itemP => {
+          const itemO: DTO_ItemOrdenServicio = new DTO_ItemOrdenServicio();
+
+          itemO.avance = 0;
+          itemO.cantidad = itemP.cantidadItemProforma || 1;
+          itemO.descripcion = itemP.descripcionItemProforma;
+          itemO.iD_OrdenServicio = rowData.iD_OrdenServicio;
+          itemO.iD_ItemOrdenServicio = itemP.iD_ProformaItem;
+          itemO.monto = itemP.precioItemProforma || 0;
+          itemO.nombreItemOrdenServicio = itemP.nombreItemProforma;
+          setItemsProformas((prev) => [...prev, itemO]);
+        });
+
+      },
+      error: errorHelpers.serverError,
+    });
   };
   //#endregion
 
@@ -153,7 +220,7 @@ export const ItemsOrdenDeServicioModal = ({
   const handleSaveEdit = () => {
     if (!editData) return;
     validacion = valida_DTO_ItemOrdenServicio.validar(editData, "U");
-    setErroresValidacion(validacion)
+    setErroresValidacion(validacion);
     if (validacion.length === 0) {
       itemsOrdenesService.actualizarItemsOrdensDeServicio(editData).subscribe({
         next: (result: DTO_Respuesta) => {
@@ -166,9 +233,54 @@ export const ItemsOrdenDeServicioModal = ({
         error: errorHelpers.serverError,
       });
     } else {
-      notificationHelpers.warningAlert("Por favor valida los datos ingresados nuevamente");
+      notificationHelpers.warningAlert(
+        "Por favor valida los datos ingresados nuevamente"
+      );
     }
   };
+
+
+  const handleSaveItenmsDesdeProforma = () => {
+
+
+    let cont = 1;
+    validacion = []
+    itemsProformas.some(item => {
+      cont++
+      validacion = valida_DTO_ItemOrdenServicio.validar(item, "C");
+      if (validacion.length > 0) {
+        notificationHelpers.warningAlert(
+          "Revisa la el registro #" + cont + " " + validacion[0].valor
+        );
+
+        const el = rowRefs.current[cont];
+
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
+
+
+        return true;
+      }
+
+
+    });
+
+    if (validacion.length === 0) {
+      itemsOrdenesService.guardarItemsDesdeProforma(itemsProformas).subscribe({
+        next: (result: DTO_Respuesta) => {
+          setItemsOrdenes((prev) => [...prev, ...itemsProformas]);
+          //@ts-expect-error --eer
+          document.querySelector('a[href="#items"]').click();
+          setItemsProformas(new Array<DTO_ItemOrdenServicio>())
+          notificationHelpers.successAlert(result.mensaje);
+        },
+        error: errorHelpers.serverError,
+      });
+    }
+  };
+
+
   //#endregion
 
   //#region 🗑 Eliminar
@@ -179,6 +291,14 @@ export const ItemsOrdenDeServicioModal = ({
     setItemOrderToDelete(item);
     setConfirmContext("delete");
     setIsConfirmOpen(true);
+  };
+
+  const handleChange = (index: any, field: any, value: any) => {
+    setItemsProformas((prev) => {
+      const newItems = [...prev];
+      newItems[index] = { ...newItems[index], [field]: value };
+      return newItems;
+    });
   };
 
   const handleConfirmDelete = (action: boolean | null) => {
@@ -228,7 +348,7 @@ export const ItemsOrdenDeServicioModal = ({
       if (confirmContext === "cancelAdd") {
         setIsModalFormOpen(false);
         notificationHelpers.infoAlert("Nuevo ítem descartado correctamente");
-        setErroresValidacion([])
+        setErroresValidacion([]);
       } else if (confirmContext === "delete") {
         handleConfirmDelete(true);
       }
@@ -239,7 +359,7 @@ export const ItemsOrdenDeServicioModal = ({
   //#endregion
 
   //#region 🧾 Formularios y renderizadores
-  const registerFormFields: FieldConfig<DTO_ItemOrdenServicio>[] = [
+  const registerFormFields: FieldConfig<any>[] = [
     ...ItemsOrdenServicioFormEditFields,
     {
       key: "avance",
@@ -251,6 +371,29 @@ export const ItemsOrdenDeServicioModal = ({
           onChange={(value) =>
             setFormData((prev) => ({ ...prev, avance: value }))
           }
+        />
+      ),
+    },
+    {
+      key: "Tarifario",
+      label: "Tarifario",
+      type: "custom",
+      order: 1,
+      renderer: () => (
+        <AsyncTarifaSelect
+          value={tarifaSeleccionada}
+          onChange={(op) => {
+            setTarifaSeleccionada(op);
+            const itemsConTarifa: DTO_ItemOrdenServicio = {
+              ...formData,
+              nombreItemOrdenServicio: op?.tarifa.nombreTarifa || "",
+              descripcion: op?.tarifa.descripcionTarifa || "",
+              monto: op?.tarifa.precioTarifa || 0,
+            }
+            setFormData(itemsConTarifa);
+          }}
+          reloadKey={reloadKey}
+          negocio={negocio}
         />
       ),
     },
@@ -344,42 +487,250 @@ export const ItemsOrdenDeServicioModal = ({
   return (
     <div
       className="modal fade show d-block shadowClearBackground"
+      // className="modal fade show d-block shadowClearBackground"
       onClick={onHide}
+      ref={modalRef}
+      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
+
     >
       <div
-        className="modal-dialog modal-dialog-centered modal-lg"
+        className="modal-dialog modal-fullscreen p-4 p-lg-20 d-flex justify-content-center align-items-center"
+
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="modal-content resizable-metronic-modal">
-          <div className="modal-header cursor-move">
-            <h2 className="fw-bold">{title}</h2>
+        <div className="modal-content resizable-metronic-modal" style={{ borderRadius: "0.475rem", maxWidth: '1200px' }}>
+          <div className="modal-header cursor-move border-0 p-5 py-4 py-lg-8 px-lg-10">
+            <h2 className="fw-light text-gray-400 fs-5">
+              {title.charAt(0).toUpperCase() + title.slice(1).toLowerCase()}
+            </h2>
             <button
               type="button"
-              className="btn btn-sm btn-icon btn-active-color-primary"
+              className="btn-close"
               onClick={onHide}
-            >
-              ✕
-            </button>
+            ></button>
           </div>
-          <div className="modal-body py-10 px-lg-17">
+          <div className="modal-body p-0">
             {loading ? (
               <LoadingPanel msj="Cargando Items de la órden de servicio, por favor espere..." />
             ) : (
-              <GenericDataTable
-                title={`Ítems de la Orden de Servicio #${rowData.iD_OrdenServicio}`}
-                columnKeys={columnKeysItemsOrdenServicio}
-                labelMap={labelMapItemsOrdenServicio}
-                // data={itemsOrdenes}
-                data={getActiveItemsOrdenes()}
-                onAdd={handleAddNew}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                customRenderers={customRenderers}
-                includeEstadoColumn
-                onRowClick={(row) =>
-                  setRowTableSelected(row as DTO_ItemOrdenServicio)
-                }
-              />
+
+              <>
+
+
+                <div className="rounded border p-0">
+                  <ul className="nav nav-tabs nav-line-tabs fs-6 px-4 justify-content-end px-lg-20 py-lg-5">
+                    <li className="nav-item">
+                      <a className="nav-link" data-bs-toggle="tab" href="#proformas">Proformas</a>
+                    </li>
+                    <li className="nav-item">
+                      <a className="nav-link active" data-bs-toggle="tab" href="#items">Ítems</a>
+                    </li>
+                  </ul>
+                  <div className="tab-content" id="myTabContent">
+                    <div className="tab-pane fade active show" id="items" role="tabpanel">
+                      <GenericDataTable
+                        title={`Orden de servicio #${rowData.iD_OrdenServicio}`}
+                        columnKeys={columnKeysItemsOrdenServicio}
+                        labelMap={labelMapItemsOrdenServicio}
+                        data={getActiveItemsOrdenes()}
+                        onAdd={handleAddNew}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        customRenderers={customRenderers}
+                        includeEstadoColumn={false}
+                        onRowClick={(row) =>
+                          setRowTableSelected(row as DTO_ItemOrdenServicio)
+                        }
+                        nowrapColumns={["Monto", "ID"]}
+                      /></div>
+                    <div className="tab-pane fade" id="proformas" role="tabpanel">
+
+
+
+                      <div className="px-4 mt-5 d-flex justify-content-between align-items-center pb-2 sticky-top bg-white border-0 shadow-sm-on-scroll" style={{ position: 'sticky', top: '0', background: 'white' }}>
+
+
+
+                        <div className="col-lg-4 col-9">
+                          <AsyncProformaSelect
+                            value={proformaSeleccionada}
+                            onChange={(op) => {
+                              setProformaSeleccionada(op);
+
+                              const proforma: DTO_Proforma = {
+                                ...buscarProforma,
+                                totalCalculado: op?.proforma.totalCalculado || 0,
+                                cliente: op?.proforma.cliente || new DTO_Cliente()
+                              }
+
+                              setBuscarProforma(proforma);
+                              handleProformaOnchange(op?.proforma as DTO_Proforma)
+                            }}
+                            reloadKey={reloadKey}
+                            negocio={negocio}
+
+                          />
+                        </div>
+
+                        <button
+                          type="button"
+                          className="btn dt-button buttons-html5 btn btn-primary btn-sm mb-0 d-flex align-items-center justify-content-center gap-2 ms-auto"
+                          onClick={handleSaveItenmsDesdeProforma}
+                        >
+                          Guardar
+                        </button>
+                      </div>
+
+
+                      <div className="card-body p-4">
+
+                        <table className="table table-sm align-middle dtr-inline" id="DataTables_Table_28" aria-describedby="DataTables_Table_28_info" data-zebra-custom="398bc2">
+                          <thead>
+                            <tr className="fs-7 text-gray-600">
+                              <th className="col-6"></th>
+                              <th className="text-start col-3"></th>
+                              <th className="text-start col-2"></th>
+                              <th className="text-center col-1"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {itemsProformas.length === 0 && (
+
+
+                              <tr className="no-hover-row">
+                                <td colSpan={5} className="dt-empty">
+                                  <div className="dt-empty-state d-flex flex-column align-items-center justify-content-center py-10">
+                                    <i className="bi bi-inbox fs-1 text-muted" aria-hidden="true"></i>
+                                    <span className="text-muted mt-2">Sin datos</span>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+
+                            {itemsProformas.map((it, idx) => (
+                              <React.Fragment key={'CardItemProforma' + idx}>
+
+
+                                {/* ======= Vista MÓVIL (< sm): grid 8/2/1/1 ======= */}
+
+                                <tr ref={(el) => (rowRefs.current[idx] = el)} className="d-table-row">
+                                  <td colSpan={5} className="pb-4">
+                                    <div className="p-2 py-4 pb-2 pt-1 border border-secoundary rounded-3 hoverElement">
+                                      <div className="row py-2 pb-5">
+                                        <div className="col-10"><span className="fs-7 text-gray-600 mt-2">{'#' + (idx + 1)}</span></div>
+                                        <div className="text-end col-2">
+
+
+                                          <button
+                                            type="button"
+                                            className="btn btn-sm p-0"
+                                            title="Eliminar"
+                                            onClick={() => handleDeleteItemProforma(it.iD_ItemOrdenServicio)}
+                                          >
+                                            <i className="bi bi-trash"></i>
+                                          </button>
+
+
+
+                                        </div>
+
+
+
+                                      </div>
+
+                                      <div className="row g-1">
+
+                                        <div className="col-6">
+                                          <label htmlFor={'txtNombre' + idx.toString()} className="fs-7 text-gray-600">Nombre</label>
+                                          <input
+                                            type="text"
+                                            className={`form-control form-control-sm 
+                                            ${valida_DTO_ItemOrdenServicio.validar(it, "C").filter(error => error.nombre === String('nombreItemOrdenServicio')).length > 0 ? "border-danger" : ""}`}
+                                            placeholder="Nombre"
+                                            value={it.nombreItemOrdenServicio}
+                                            onChange={(e) => handleChange(idx, "nombreItemOrdenServicio", e.target.value)}
+                                            key={'txtNombre' + idx.toString()}
+                                          />
+
+                                        </div>
+
+                                        <div className="col-3">
+                                          <label htmlFor={'txtPrecio' + idx.toString()} className="fs-7 text-gray-600">Monto</label>
+                                          <input
+                                            type="number"
+                                            className={`form-control form-control-sm 
+                                            ${valida_DTO_ItemOrdenServicio.validar(it, "C").filter(error => error.nombre === String('monto')).length > 0 ? "border-danger" : ""}`}
+                                            placeholder="0.00"
+                                            value={it.monto}
+                                            onChange={(e) => handleChange(idx, "monto", e.target.value)}
+                                            key={'txtPrecio' + idx.toString()}
+                                          />
+                                        </div>
+
+
+                                        <div className="col-3">
+                                          <label htmlFor={'txtCantidad' + idx.toString()} className="fs-7 text-gray-600">Cantidad</label>
+                                          <input
+                                            type="number"
+                                            className={`form-control form-control-sm 
+                                            ${valida_DTO_ItemOrdenServicio.validar(it, "C").filter(error => error.nombre === String('cantidad')).length > 0 ? "border-danger" : ""}`}
+                                            placeholder="Cant."
+                                            value={it.cantidad}
+                                            onChange={(e) => handleChange(idx, "cantidad", e.target.value)}
+                                            key={'txtCantidad' + idx.toString()}
+                                          />
+
+                                        </div>
+
+
+
+
+                                        {/* Descripción a ancho completo */}
+                                        <div className="col-12">
+                                          <label htmlFor={'txtDesc' + idx.toString()} className="fs-7 text-gray-600 mt-2">Descripción</label>
+                                          <textarea
+                                            className={`form-control form-control-sm mb-2 
+                                            ${valida_DTO_ItemOrdenServicio.validar(it, "C").filter(error => error.nombre === String('descripcion')).length > 0 ? "border-danger" : ""}`}
+
+                                            rows={2}
+                                            placeholder="Descripción"
+                                            value={it.descripcion}
+                                            onChange={(e) => handleChange(idx, "descripcion", e.target.value)}
+                                            key={'txtDesc' + idx.toString()}
+                                          />
+
+                                        </div>
+
+                                        <div className="row p-0">
+                                          <div className="text-start col-6"></div>
+                                          <div className="text-end col-6"><span className="fs-7 text-gray-600 mt-2">Importe</span> <span className="fs-7 text-gray-600 mt-2 ">{formatColones((it.cantidad || 0) * (it.monto || 0))}</span></div>
+
+
+
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </React.Fragment>
+                            ))}
+
+
+                          </tbody>
+                        </table>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+
+
+
+
+              </>
             )}
 
             <InfoModal
@@ -420,13 +771,14 @@ export const ItemsOrdenDeServicioModal = ({
             />
           </div>
           <div className="modal-footer flex-center">
-            <button type="button" className="btn btn-primary" onClick={onHide}>
+            <button type="button" className="btn btn-light" onClick={onHide}>
               Cerrar
             </button>
           </div>
         </div>
       </div>
     </div>
+
   );
   //#endregion
 };

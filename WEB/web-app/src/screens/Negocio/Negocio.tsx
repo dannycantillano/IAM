@@ -259,15 +259,18 @@ export const Negocio = () => {
     ...negocioFormEditFields,
     {
       key: "referenciaJSON",
-      label: "Referencias",
+      label: "Configuración de Ordenes de Servicio",
       type: "custom",
       renderer: () => (
+        <>
+         <p className=".text-gray-700">Cada referencia configurada se solicitará al momento de crear una orden de servicio para este negocio</p>
         <ReferenciasJsonInput
           value={formData.referenciaJSON}
           onChange={(val) =>
             setFormData((prev) => ({ ...prev, referenciaJSON: val }))
           }
         />
+        </>
       ),
       validate: (val) => {
         if (!Array.isArray(val) || val.length === 0) return "";
@@ -283,9 +286,11 @@ export const Negocio = () => {
     ...negocioFormEditFields,
     {
       key: "referenciaJSON",
-      label: "Referencias",
+      label: "Configuración de Ordenes de Servicio",
       type: "custom",
       renderer: () => (
+        <>
+        <p className=".text-gray-700">Cada referencia configurada se solicitará al momento de crear una orden de servicio para este negocio</p>
         <ReferenciasJsonInput
           hideCheckbox={true}
           editable={false}
@@ -296,6 +301,7 @@ export const Negocio = () => {
             )
           }
         />
+        </>
       ),
       validate: (val) => {
         if (!Array.isArray(val) || val.length === 0) return "";

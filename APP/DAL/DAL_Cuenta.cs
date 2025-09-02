@@ -145,6 +145,11 @@ namespace DAL
                             cuenta.TipoCuenta = UTL_DBHelper.ReadNullSafeString(reader["TipoCuenta"]);
                             cuenta.ID_OrdenServicio = UTL_DBHelper.ReadNullSafeInt(reader["ID_OrdenServicio"]);
 
+                            //Campos Calculados
+                            cuenta.MontoAbonado = UTL_DBHelper.ReadNullSafeDecimal(reader["MontoAbonado"]);
+                            cuenta.SaldoPendiente = UTL_DBHelper.ReadNullSafeDecimal(reader["SaldoPendiente"]);
+                            cuenta.EstadoPago = UTL_DBHelper.ReadNullSafeString(reader["EstadoPago"]);
+
                             string json = UTL_DBHelper.ReadNullSafeString(reader["DetalleJSON"]);
                             if (!string.IsNullOrWhiteSpace(json))
                             {

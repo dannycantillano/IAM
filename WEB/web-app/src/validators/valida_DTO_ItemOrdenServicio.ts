@@ -33,6 +33,23 @@ export class valida_DTO_ItemOrdenServicio {
       });
     }
 
+        if (validadorGenerico.isEmpty(item.cantidad)) {
+      errores.push({
+        nombre: "cantidad",
+        valor: "La cantidad no puede estar vacía"
+      });
+    } else if (!validadorGenerico.isNumeric(item.cantidad)) {
+      errores.push({
+        nombre: "cantidad",
+        valor: "La cantidad debe ser numérico."
+      });
+    } else if (!validadorGenerico.isNonNegative(item.cantidad)) {
+      errores.push({
+        nombre: "cantidad",
+        valor: "La cantidad debe ser un valor positivo."
+      });
+    }
+
     if (validadorGenerico.isEmpty(item.estado.iD_Estado)) {
       errores.push({
         nombre: "estado",
@@ -73,6 +90,11 @@ export class valida_DTO_ItemOrdenServicio {
       errores.push({
         nombre: "monto",
         valor: "El monto debe ser un número válido."
+      });
+    }else if (!validadorGenerico.isNonNegative(item.cantidad)) {
+      errores.push({
+        nombre: "cantidad",
+        valor: "El monto debe ser un valor positivo."
       });
     }
 

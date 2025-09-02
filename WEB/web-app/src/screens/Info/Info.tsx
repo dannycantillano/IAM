@@ -14,8 +14,7 @@ export const Info = () => {
               ></i>
               <h2 className="mb-2 fw-bold">¡Bienvenido!</h2>
               <p className="text-muted mb-4">
-                Explora y administra toda la información relevante de la
-                aplicación desde este espacio centralizado.
+
               </p>
               {/* Alerta de versión beta */}
               <div
@@ -25,10 +24,9 @@ export const Info = () => {
                 <div className="d-flex align-items-center">
                   <i className="bi bi-info-circle-fill me-2 fs-4"></i>
                   <div>
-                    <strong className="d-block mb-1">Nota importante</strong>
-                    Este sistema se encuentra en <b>versión Beta</b> y está en
-                    constante evolución. Agradecemos su comprensión mientras
-                    mejoramos la plataforma.
+
+                    Este sistema se encuentra en una versión <b>Beta</b> y está en
+                    constante evolución.
                   </div>
                 </div>
               </div>
@@ -49,15 +47,15 @@ export const Info = () => {
                         nuevas funcionalidades como:
                       </p>
                       <ul className="text-muted text-start mb-0">
-                        <li>
-                          Pantalla de estadísticas y visualización de gráficas
-                          interactivas
-                        </li>
+                      
                         <li>Mejoras en la navegación y usabilidad</li>
                         <li>Reportes personalizados</li>
                         <li>Optimización de rendimiento</li>
-                        <li>Integración con nuevos módulos</li>
+                        <li>Integración con nuevos módulos (como el Módulo de productos)</li>
+                        <li>Integración con el chat de inteligencia artificial</li>
+                        <li>Mensajes de info/ayuda en partes críticas del sistema</li>
                       </ul>
+
                     </div>
                   </div>
                 </div>
@@ -79,30 +77,111 @@ export const Info = () => {
                   </div>
                 </div>
               </div>
-              {/* <div className="d-flex justify-content-center gap-3 mb-3">
-                <a href="/docs" className="btn btn-primary">
-                  <i className="bi bi-journal-text me-2"></i>
-                  Documentación
-                </a>
-                <a href="/soporte" className="btn btn-outline-secondary">
-                  <i className="bi bi-life-preserver me-2"></i>
-                  Soporte
-                </a>
+              <div className="accordion" id="kt_accordion_1">
+                <div className="accordion-item">
+                  <h2 className="accordion-header" id="kt_accordion_1_header_1">
+                    <button className="accordion-button fs-4 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#kt_accordion_1_body_1" aria-expanded="true" aria-controls="kt_accordion_1_body_1">
+                      <span className="fs-4 py-2">Versión V1.0.5 {' --> '}</span> <span className="fs-4 text-muted px-4"> 01/09/2025</span>
+                    </button>
+                  </h2>
+                  <div id="kt_accordion_1_body_1" className="accordion-collapse collapse show" aria-labelledby="kt_accordion_1_header_1" data-bs-parent="#kt_accordion_1">
+                    <div className="accordion-body">
+
+                      <table className="table table-striped gy-7 gs-7">
+                        <thead>
+
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Se añadió la opción del menú "Tarifario", que permite guardar tarifas personalizadas para utilizarlas posteriormente en distintas áreas del sistema.</td>
+                          </tr>
+                          <tr>
+                            <td>Se añadió la opción del menú "Proformas", para crear proformas por cliente; luego pueden convertirse en ítems de una orden de servicio o exportarse a PDF.</td>
+                          </tr>
+                          <tr>
+                            <td>Se ajustaron las tablas de datos para ofrecer un diseño adaptable (responsive) y una visualización óptima en dispositivos móviles.</td>
+                          </tr>
+                          <tr>
+                            <td>Se optimizaron las ventanas modales: se redujeron los márgenes y se amplió el área de trabajo en dispositivos móviles.</td>
+                          </tr>
+                          <tr>
+                            <td>Se corrigió un error que afectaba la carga del Monitor en algunos navegadores (Safari y Maxthon).</td>
+                          </tr>
+                          <tr>
+                            <td>Se corrigió un error al editar transacciones.</td>
+                          </tr>
+                          <tr>
+                            <td>Se corrigió un error que impedía el cálculo correcto de las métricas en el menú "Inicio".</td>
+                          </tr>
+                          <tr>
+                            <td>Se reorganizaron, de izquierda a derecha y de forma prioritaria, las columnas de las tablas de datos para mejorar la lectura.</td>
+                          </tr>
+                          <tr>
+                            <td>Se mejoró el buscador de clientes para una búsqueda más rápida y precisa.</td>
+                          </tr>
+                          <tr>
+                            <td>Se mejoró el despliegue de alertas en dispositivos móbles.</td>
+                          </tr>
+                        </tbody>
+
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="accordion-item">
+                  <h2 className="accordion-header" id="kt_accordion_1_header_2">
+                    <button className="accordion-button fs-4 fw-bold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#kt_accordion_1_body_2" aria-expanded="false" aria-controls="kt_accordion_1_body_2">
+                      <span className="fs-4 py-2">Versión V1.0.4 {' -->  '}</span> <span className="fs-4 text-muted px-4"> 18/08/2025</span>
+                    </button>
+                  </h2>
+                  <div id="kt_accordion_1_body_2" className="accordion-collapse collapse" aria-labelledby="kt_accordion_1_header_2" data-bs-parent="#kt_accordion_1">
+                    <div className="accordion-body">
+                      <table className="table table-striped gy-7 gs-7">
+                        <thead>
+
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Se lanzó la versión Beta pública de IAM (Intelligent Admin Manager), una plataforma web diseñada para la administración de negocios.</td>
+                          </tr>
+                          <tr>
+                            <td>Se implementó el menú principal con 7 opciones fundamentales: Inicio, Clientes, Cuentas, Órdenes de servicio, Monitor, Transacciones y Negocios.</td>
+                          </tr>
+                          <tr>
+                            <td>En el menú "Inicio" se incluyeron gráficas y métricas clave: ingresos, gastos, balance, cuentas por pagar y por cobrar, además de estadísticas de clientes, órdenes de servicio y transacciones, todo filtrable por periodos de tiempo.</td>
+                          </tr>
+                          <tr>
+                            <td>Se habilitó el módulo "Clientes" para registrar y gestionar la lista de clientes asociados a cada usuario.</td>
+                          </tr>
+                          <tr>
+                            <td>Se incorporó el módulo "Cuentas" para el registro de cuentas por pagar y por cobrar, con la posibilidad de asociar transacciones como abonos al saldo.</td>
+                          </tr>
+                          <tr>
+                            <td>Se creó el módulo "Órdenes de servicio", con campos de referencia configurables, fechas estimadas y reales, y una lista de ítems con nombre y precio.</td>
+                          </tr>
+                          <tr>
+                            <td>Se implementó el "Monitor" en tiempo real con 4 columnas (nuevas, en proceso, en pausa y finalizadas), que permite visualizar y actualizar el estado de las órdenes de servicio.</td>
+                          </tr>
+                          <tr>
+                            <td>Se añadió el menú "Transacciones" para registrar ingresos y gastos del negocio.</td>
+                          </tr>
+                          <tr>
+                            <td>Se incorporó el módulo "Negocios", que permite crear hasta 3 negocios por usuario, con datos generales y referencias personalizadas para órdenes de servicio.</td>
+                          </tr>
+                        </tbody>
+
+
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+
               </div>
-              <div className="d-flex justify-content-center gap-3">
-                <a href="/roadmap" className="btn btn-outline-primary">
-                  <i className="bi bi-map me-2"></i>
-                  Roadmap
-                </a>
-                <a href="/feedback" className="btn btn-outline-success">
-                  <i className="bi bi-chat-dots me-2"></i>
-                  Enviar feedback
-                </a>
-              </div> */}
               <div className="text-center mt-4">
                 <small className="text-muted">
-                  &copy; {new Date().getFullYear()} IAM Web App. Todos los
-                  derechos reservados.
+                  &copy; {new Date().getFullYear()} IAM
                 </small>
               </div>
             </div>

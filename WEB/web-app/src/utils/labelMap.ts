@@ -1,18 +1,24 @@
 import { FieldConfig } from "@/components/Modals/GenericFormModal/types";
 import { DTO_Cliente, DTO_Cuenta, DTO_ItemOrdenServicio, DTO_Negocio, DTO_OrdenServicio, DTO_Transacciones } from "@/models";
+import { DTO_Proforma } from "@/models/DTO_Proforma";
+import { DTO_ProformaItem } from "@/models/DTO_ProformaItem";
+import { DTO_Tarifa } from "@/models/DTO_Tarifa";
 
 //#region columnas de tablas
 
 //  Define configuraciones de campos de formulario (FieldConfig) para construir formularios dinámicos relacionados con estos modelos.
 // Los label maps permiten mostrar nombres amigables en la UI, y los arreglos de campos de formulario se usan para generar formularios de manera flexible.
 export const columnKeysCuenta: (keyof DTO_Cuenta)[] = [
+
     "iD_Cuenta",
-    "concepto",
     "monto",
-    "fechaInicial",
-    "fechaLimite",
+    "montoAbonado",
+    "saldoPendiente",
+    "estadoPago",
     "tipoCuenta",
-    "iD_OrdenServicio",
+    "fechaLimite",
+    "fechaInicial",
+    "concepto",
 
 ];
 export const columnKeysNegocio: (keyof DTO_Negocio)[] = [
@@ -28,7 +34,6 @@ export const columnKeysOrdenDeServicio: (keyof DTO_OrdenServicio)[] = [
     "iD_OrdenServicio",
     "fechaOrdenServicio",
     "fechaEstimadaEntrega",
-    "notaOrdenServicio"
 ];
 
 export const columnKeysCliente: (keyof DTO_Cliente)[] = [
@@ -38,25 +43,69 @@ export const columnKeysCliente: (keyof DTO_Cliente)[] = [
     "telefonoCliente",
     "correoCliente",
 ];
-
 export const columnKeysItemsOrdenServicio: (keyof DTO_ItemOrdenServicio)[] = [
     "iD_ItemOrdenServicio",
-    "iD_OrdenServicio",
+    "monto",
+    "cantidad",
     "nombreItemOrdenServicio",
     "descripcion",
-    "monto",
+
 ];
 
 export const columnKeysTransacciones: (keyof DTO_Transacciones)[] = [
     "iD_Transaccion",
-    "iD_Negocio",
     "fechaTransaccion",
-    "concepto",
     "monto",
     "tipo",
+    "concepto",
     "tipoNumReferencia",
     "numReferencia",
 
+];
+
+export const columnKeysTransaccionesPorCuenta: (keyof DTO_Transacciones)[] = [
+    "iD_Transaccion",
+    "fechaTransaccion",
+    "monto",
+    "tipo",
+    "concepto",
+
+];
+
+export const columnKeysTarifa: (keyof DTO_Tarifa)[] = [
+    "iD_Tarifa",
+    // "iD_Negocio",
+    "nombreTarifa",
+    "descripcionTarifa",
+    "precioTarifa",
+    "fechaCreacion",
+    // "fechaModificacion",
+];
+
+export const columnKeysProforma: (keyof DTO_Proforma)[] = [
+    "iD_Proforma",                // ID principal
+    "cliente",                    // Cliente asociado
+    "observacionProforma",        // Observaciones
+    "fechaProforma",              // Fecha de creación
+    "fechaVencimiento",           // Fecha de vencimiento
+    "descuentoProforma",          // % Descuento aplicado
+    "montoDescuento",             // Monto de descuento
+    "impuestoPorcentualProforma", // % de impuesto
+    "montoImpuesto",              // Monto de impuesto
+    "subTotal",                   // Subtotal antes de descuentos/impuestos
+    "baseImponible",              // Monto base después de descuento
+    "totalCalculado",
+];
+
+export const columnKeysItemsProforma: (keyof DTO_ProformaItem)[] = [
+    "iD_ProformaItem",
+    "iD_Proforma",
+    "nombreItemProforma",
+    "descripcionItemProforma",
+    "cantidadItemProforma",
+    "precioItemProforma",
+    "fechaCreacion",
+    "fechaModificacion",
 ];
 
 //#endregion
@@ -172,10 +221,10 @@ export const keysInfoModalCuenta: FieldConfig<DTO_Cuenta>[] = [
         key: "iD_Cuenta",
         label: "Código",
         type: "text",
-        order: 1,
+        order: 0,
     },
     {
-        key: "estado",
+        key: "estadoPago",
         label: "Estado",
         type: "text",
         order: 2,
@@ -214,7 +263,7 @@ export const keysInfoModalCuenta: FieldConfig<DTO_Cuenta>[] = [
         key: "descripcion",
         label: "Descripción",
         type: "text",
-        order: 6,
+        order: 8,
     },
 ];
 
@@ -297,12 +346,6 @@ export const keysInfoModalTransacciones: FieldConfig<DTO_Transacciones>[] = [
         order: 1,
     },
     {
-        key: "iD_Negocio",
-        label: "Negocio #",
-        type: "text",
-        order: 2,
-    },
-    {
         key: "fechaTransaccion",
         label: "Fecha",
         type: "date",
@@ -331,15 +374,66 @@ export const keysInfoModalTransacciones: FieldConfig<DTO_Transacciones>[] = [
         label: "N° Referencia",
         type: "text",
         order: 8,
+    }
+];
+
+export const keysInfoModalTarifa: FieldConfig<DTO_Tarifa>[] = [
+    {
+        key: "iD_Tarifa",
+        label: "ID",
+        type: "text",
+        order: 1,
+    },
+    {
+        key: "iD_Negocio",
+        label: "ID Negocio",
+        type: "text",
+        order: 2,
+    },
+    {
+        key: "nombreTarifa",
+        label: "Nombre",
+        type: "text",
+        order: 3,
+    },
+    {
+        key: "descripcionTarifa",
+        label: "Descripción",
+        type: "text",
+        order: 4,
+    },
+    {
+        key: "fechaCreacion",
+        label: "Creación",
+        type: "date",
+        order: 6,
+    },
+    {
+        key: "fechaModificacion",
+        label: "Modificación",
+        type: "date",
+        order: 7,
     },
     {
         key: "estado",
         label: "Estado",
         type: "text",
-        order: 9,
+        order: 8,
     },
 ];
 
+export const keysInfoModalProforma: FieldConfig<DTO_Proforma>[] = [
+    { key: "iD_Proforma", label: "ID", type: "text", order: 1 },
+    { key: "fechaProforma", label: "Creación", type: "date", order: 2 },
+    { key: "fechaVencimiento", label: "Vencimiento", type: "date", order: 3 },
+    {
+        key: "estado",
+        label: "Estado",
+        type: "text",
+        order: 6,
+    },
+
+];
 //#endregion
 
 //#region tablas
@@ -347,17 +441,23 @@ export const keysInfoModalTransacciones: FieldConfig<DTO_Transacciones>[] = [
 // Este archivo define mapas de etiquetas (label maps) para mostrar nombres legibles en los titulos del DataTable de los modelos.
 export const labelMapCuenta: Record<string, string> = {
     iD_Cuenta: "ID",
+    iD_OrdenServicio: "Orden",
     estado: "Estado",
     concepto: "Concepto",
     monto: "Monto",
-    fechaInicial: "Fecha Inicial",
-    fechaLimite: "Fecha Límite",
-    tipoCuenta: "Tipo De Cuenta",
-    iD_OrdenServicio: "Orden De Servicio #",
+    fechaInicial: "Creación",
+    fechaLimite: "Límite",
+    tipoCuenta: "Tipo",
+
     fechaModificacion: "Fecha de Modificación",
     detalleJSON: "Detalles",
+    montoAbonado: "Abonado",
+    saldoPendiente: "Saldo",
+    estadoPago: "Estado"
 
 };
+
+
 
 export const labelMapNegocio: Record<string, string> = {
     iD_Negocio: "ID",
@@ -374,8 +474,8 @@ export const labelMapNegocio: Record<string, string> = {
 export const labelMapOrdenDeServicio: Record<string, string> = {
     iD_OrdenServicio: "ID",
     estado: "Estado",
-    fechaOrdenServicio: "Fecha",
-    fechaEstimadaEntrega: "Entrega Estimada",
+    fechaOrdenServicio: "Creación",
+    fechaEstimadaEntrega: "Estimación",
     fechaInicio: "Fecha de Inicio",
     fechaFinal: "Fecha Final",
     fechaEntrega: "Fecha de Entrega",
@@ -394,10 +494,10 @@ export const labelMapCliente: Record<string, string> = {
 
 export const labelMapItemsOrdenServicio: Record<string, string> = {
     iD_ItemOrdenServicio: "ID",
-    iD_OrdenServicio: "ID Orden Servicio",
-    nombreItemOrdenServicio: "Nombre del Item",
+    nombreItemOrdenServicio: "Nombre",
     descripcion: "Descripción",
     monto: "Monto",
+    cantidad: "Cantidad",
     avance: "Avance",
     estado: "Estado",
 };
@@ -413,7 +513,44 @@ export const labelMapTransacciones: Record<string, string> = {
     numReferencia: "N° Referencia",
     estado: "Estado",
 };
+export const labelMapTarifa: Record<string, string> = {
+    iD_Tarifa: "ID",
+    iD_Negocio: "ID Negocio",
+    nombreTarifa: "Nombre",
+    descripcionTarifa: "Descripción",
+    precioTarifa: "Precio",
+    fechaCreacion: "Creación",
+    fechaModificacion: "Modificación",
+    estado: "Estado",
+};
 
+export const labelMapProforma: Record<string, string> = {
+    iD_Proforma: "ID",
+    fechaProforma: "Creación",
+    fechaVencimiento: "Vencimiento",
+    cliente: "Cliente",
+    observacionProforma: "Observaciones",
+    descuentoProforma: "Descuento",
+    montoDescuento: "Monto de descuento",
+    impuestoPorcentualProforma: "IVA(%)",
+    montoImpuesto: "Monto de impuesto",
+    subTotal: "Subtotal",
+    baseImponible: "Subtotal c/desc:",
+    totalCalculado: "Total final",
+    estado: "Estado",
+};
+
+export const labelMapItemsProforma: Record<string, string> = {
+    iD_ProformaItem: "ID",
+    iD_Proforma: "ID Proforma",
+    nombreItemProforma: "Nombre",
+    descripcionItemProforma: "Descripción",
+    cantidadItemProforma: "Cantidad",
+    precioItemProforma: "Precio",
+    fechaCreacion: "Creación",
+    fechaModificacion: "Modificación",
+    estado: "Estado",
+};
 //#endregion
 
 //#region campos a mostrar para el form de editar
@@ -435,7 +572,7 @@ export const negocioFormEditFields: Array<FieldConfig<DTO_Negocio>> =
                 type: "text" as any,
             }))
 
-];
+    ];
 
 export const cuentasFormEditFields: FieldConfig<DTO_Cuenta>[] = [
     {
@@ -444,13 +581,6 @@ export const cuentasFormEditFields: FieldConfig<DTO_Cuenta>[] = [
         type: "text",
         readOnly: true,
         order: 2,
-    },
-    {
-        key: "estado",
-        label: labelMapCuenta["estado"] ?? "Estado",
-        type: "text",
-        readOnly: true,
-        order: 3,
     },
     {
         key: "descripcion",
@@ -543,12 +673,20 @@ export const ItemsOrdenServicioFormEditFields: Array<FieldConfig<DTO_ItemOrdenSe
 ];
 
 export const ordenServicioFormEditFields: Array<FieldConfig<DTO_OrdenServicio>> = [
+
+    {
+        key: "fechaEstimadaEntrega",
+        label: "Estimación de Entrega",
+        type: "date",
+        required: false,
+        order: 1, //4
+    },
     {
         key: "fechaInicio",
         label: labelMapOrdenDeServicio["fechaInicio"] ?? "Fecha de Inicio",
         type: "date",
         required: false,
-        order: 1,
+        order: 2, //1
         errorMessage: "La fecha de inicio es obligatoria",
     },
     {
@@ -556,7 +694,7 @@ export const ordenServicioFormEditFields: Array<FieldConfig<DTO_OrdenServicio>> 
         label: labelMapOrdenDeServicio["fechaFinal"] ?? "Fecha Final",
         type: "date",
         required: false,
-        order: 2,
+        order: 3, //2
         errorMessage: "La fecha final es obligatoria",
     },
     {
@@ -564,15 +702,9 @@ export const ordenServicioFormEditFields: Array<FieldConfig<DTO_OrdenServicio>> 
         label: labelMapOrdenDeServicio["fechaEntrega"] ?? "Fecha de Entrega",
         type: "date",
         required: false,
-        order: 3,
+        order: 4, //3
     },
-    {
-        key: "fechaEstimadaEntrega",
-        label: labelMapOrdenDeServicio["fechaEstimadaEntrega"] ?? "Entrega Estimada",
-        type: "date",
-        required: false,
-        order: 4,
-    },
+
     {
         key: "notaOrdenServicio",
         label: labelMapOrdenDeServicio["notaOrdenServicio"] ?? "Nota",
@@ -599,6 +731,27 @@ export const transaccionesFormEditFields: FieldConfig<DTO_Transacciones>[] = [
         ]
     },
     { key: "numReferencia", label: "N° Referencia", type: "text", required: false }
+];
+
+export const tarifaFormEditFields: Array<FieldConfig<DTO_Tarifa>> = [
+    {
+        key: "nombreTarifa",
+        label: labelMapTarifa["nombreTarifa"] ?? "Nombre",
+        type: "text",
+        required: true,
+    },
+    {
+        key: "descripcionTarifa",
+        label: labelMapTarifa["descripcionTarifa"] ?? "Descripción",
+        type: "textarea",
+        required: false,
+    },
+    {
+        key: "precioTarifa",
+        label: labelMapTarifa["precioTarifa"] ?? "Precio",
+        type: "number",
+        required: false,
+    },
 ];
 
 //#endregion
@@ -628,4 +781,26 @@ export const cuentasFormAddFields: FieldConfig<DTO_Cuenta>[] = [
         order: 4,
     },
 ];
+
+export const tarifaFormAddFields: Array<FieldConfig<DTO_Tarifa>> = [
+    {
+        key: "nombreTarifa",
+        label: labelMapTarifa["nombreTarifa"] ?? "Nombre",
+        type: "text",
+        required: true,
+    },
+    {
+        key: "descripcionTarifa",
+        label: labelMapTarifa["descripcionTarifa"] ?? "Descripción",
+        type: "textarea",
+        required: false,
+    },
+    {
+        key: "precioTarifa",
+        label: labelMapTarifa["precioTarifa"] ?? "Precio",
+        type: "number",
+        required: true,
+    },
+];
+
 //#endregion

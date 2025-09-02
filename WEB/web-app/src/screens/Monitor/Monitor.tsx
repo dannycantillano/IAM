@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as signalR from "@microsoft/signalr";
-import sonidoMonitor from "../../assets/media/audios/Monitor.mp3";
+//@ts-expect-error -- error esperado
+import sonidoMonitor from "../../assets/media/audios/Monitor.mp3?url";
 import {
   errorHelpers,
   notificationHelpers,
@@ -142,11 +143,6 @@ export const Monitor = () => {
   //#region websoket
   const getToken = () => localStorage.getItem("accesToken") || "";
 
-  useEffect(() => {
-    if (Notification.permission !== "granted") {
-      Notification.requestPermission();
-    }
-  }, []);
 
   useEffect(() => {
     abortedRef.current = false;
@@ -190,7 +186,7 @@ export const Monitor = () => {
     };
 
     const handleDisconnect = async (error?: Error) => {
-      if (abortedRef.current) return;
+      if (abortedRef.current || connectionRef.current?.state == "Connected") return;
 
       setEstadoConexion("Desconectado");
       notificationHelpers.errorAlert("Monitor desconectado");
@@ -200,15 +196,19 @@ export const Monitor = () => {
         const renovado = await extraerYRenovarToken(error.message);
         if (renovado && !abortedRef.current) {
           // Pequeño retardo antes de reconectar
-          await new Promise((r) => setTimeout(r, 3000));
-          return iniciarConexion();
+          await new Promise((r) => setTimeout(r, 4000));
+          iniciarConexion();
         }
       }
-
+ 
       // Reintento normal
-      if (!abortedRef.current) {
+      else if (!abortedRef.current) {
         // Usar retryTimeoutRef.current para almacenar el ID del timeout
-        retryTimeoutRef.current = window.setTimeout(iniciarConexion, 3000); // `setTimeout` devuelve un número en el navegador
+        if(connectionRef.current?.state == signalR.HubConnectionState.Disconnected){
+          await new Promise((r) => setTimeout(r, 4000));
+          iniciarConexion();
+        }
+        // `setTimeout` devuelve un número en el navegador
       }
     };
 
@@ -294,9 +294,12 @@ export const Monitor = () => {
 
     const iniciarConexion = async () => {
       if (abortedRef.current || intentoRef.current) return;
+
       intentoRef.current = true;
 
       await limpiarConexion();
+
+
       if (abortedRef.current) {
         intentoRef.current = false;
         return;
@@ -317,6 +320,7 @@ export const Monitor = () => {
       connection.onreconnected(handleReconnected);
       connection.onclose(handleDisconnect);
 
+        
       if (state.negocio != null) {
         try {
           await connection.start();
@@ -343,6 +347,9 @@ export const Monitor = () => {
       }
     };
     iniciarConexion();
+  
+    if(connectionRef.current?.state == "Disconnected" || connectionRef.current?.state == undefined)
+    intentoRef.current = false;
 
     return () => {
       if (state.negocio != null) {
@@ -352,11 +359,11 @@ export const Monitor = () => {
         }
         limpiarConexion().then(() => {
           setEstadoConexion("Desconectado");
-          notificationHelpers.infoAlert("Monitor cerrado al salir de la vista");
+          notificationHelpers.infoAlert("Monitor cerrado");
         });
       }
     };
-  }, []);
+  }, [state]);
   //#endregion
 
   //#region crear cuenta
@@ -399,7 +406,7 @@ export const Monitor = () => {
             iD_Negocio: rowData.iD_Negocio ?? 0,
             iD_OrdenServicio: rowData.iD_OrdenServicio,
             tipoCuenta: "Cuenta Por Cobrar",
-            concepto: `Cuenta por cobrar de la orden de servicio #${rowData.iD_OrdenServicio}`,
+            concepto: `Cobro de Orden de Servicio #${rowData.iD_OrdenServicio}`,
             monto: items.reduce(
               (acc, item) =>
                 acc +
@@ -417,8 +424,12 @@ export const Monitor = () => {
                   typeof item.monto === "string"
                     ? item.monto
                     : item.monto?.toString() || "0.00",
+                cantidad:
+                  typeof item.cantidad === "string"
+                    ? item.cantidad
+                    : item.cantidad?.toString() || "0.00",
               })),
-              descuento: { nombre: "Descuento", valor: "0" },
+              descuento: { nombre: "Monto", valor: "0" },
               impuesto: { nombre: "Impuesto", valor: "0" },
             },
           };

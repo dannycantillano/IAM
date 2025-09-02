@@ -1,10 +1,34 @@
 import { createRoot } from 'react-dom/client';
-import './styles.css';
+
+;(window as any).global = window
+
+import "./styles.css"
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css"
+import "@/assets/plugins/global/plugins.bundle.css"
+import "@/assets/css/style.bundle.css"
+
+// 2) jQuery en global (antes de los bundles legacy)
+import $ from "jquery"
+window.$ = $
+window.jQuery = $
+
+
+
+// 3) Config y JS legacy como **side effects**
+//    (si existen en esas rutas)
+//import "@/assets/config/config.js"
+import "@/assets/plugins/global/plugins.bundle.js"
+import "@/assets/js/scripts.bundle.js"
+import "@/assets/js/custom/widgets.js"
+import "@/assets/js/custom/apps/chat/chat.js"
+import "@/assets/js/custom/modals/create-app.js"
+import "@/assets/js/custom/modals/upgrade-plan.js"
+import "@/assets/js/custom/documentation/forms/daterangepicker.js"
+
+
 import { App } from '@/App';
-import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
-import "@/assets/plugins/global/plugins.bundle.css";
-import "@/assets/css/style.bundle.css";
-import $ from 'jquery';
+
+
 //import { StrictMode } from 'react';
 interface AppRuntimeConfig {
   BASE_URL: string;
@@ -22,7 +46,7 @@ declare global {
     }
 }
 
-// Importa jQuery y asigna globalmente
+
 window.$ = $;
 window.jQuery = $;
 
