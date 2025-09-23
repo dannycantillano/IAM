@@ -8,3 +8,4 @@ export * from "./items_ordenes.service";
 export * from "./monitor.service";
 export * from "./metrica.service";
 export * from "./items_proformas.service";
+export * from "./proformas.service";

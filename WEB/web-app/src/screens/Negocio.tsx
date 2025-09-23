@@ -13,7 +13,12 @@ import ReactDOM from "react-dom/client";
 import { FILTER_STATUS, STATUS_TBL } from "@/constants";
 import { AuthContext } from "@/context";
 import { useApp } from "@/hooks/useApp";
-import { DTO_Negocio, DTO_Respuesta, DTO_FiltroEstado, DTO_Param } from "@/models";
+import {
+  DTO_Negocio,
+  DTO_Respuesta,
+  DTO_FiltroEstado,
+  DTO_Param,
+} from "@/models";
 import { negocioService } from "@/services";
 import {
   keysInfoModalNegocio,
@@ -31,12 +36,11 @@ import { valida_DTO_Negocio } from "@/validators/valida_DTO_Negocio";
 import { FieldConfig } from "@/types/types";
 
 export const Negocio = () => {
-
   // #region Validaciones en los formularios
   const [erroresValidacion, setErroresValidacion] = useState<DTO_Param[]>([]);
   let validacion: Array<DTO_Param>;
   const eliminarError = (campo: string) => {
-    setErroresValidacion(prev => prev.filter(e => e.nombre !== campo));
+    setErroresValidacion((prev) => prev.filter((e) => e.nombre !== campo));
   };
   // #endregion
 
@@ -78,6 +82,8 @@ export const Negocio = () => {
   );
   //#endregion
 
+  const [loadingForm, setLoadingForm] = useState(false);
+
   //#region 🚀 Obtener negocios al iniciar
   useEffect(() => {
     negocioService.obtenerNegocios(filtroEstado).subscribe({
@@ -94,11 +100,18 @@ export const Negocio = () => {
 
   //#region ✅ Registrar negocio
   const handleAddNewBusiness = () => {
+    if (business.length >= 3) {
+      notificationHelpers.warningAlert(
+        "Has alcanzado el límite máximo de negocios permitidos (3)."
+      );
+      return;
+    }
     setFormData(new DTO_Negocio());
     setIsModalFormOpen(true);
   };
 
   const handleSave = () => {
+    setLoadingForm(true);
     formData.iD_Usuario = user?.iD_Usuario || 0;
     formData.estado = {
       iD_Estado: STATUS_TBL.BUSINESS.ACTIVE,
@@ -107,16 +120,14 @@ export const Negocio = () => {
     };
 
     validacion = valida_DTO_Negocio.validar(formData, "C");
-    setErroresValidacion(validacion)
+    setErroresValidacion(validacion);
     if (validacion.length === 0) {
-
       negocioService.registrarNegocio(formData).subscribe({
         next: (result: DTO_Respuesta) => {
           const nuevo = (result.resultado as DTO_Negocio[])[0];
           if (result.codigo === "B002") {
             notificationHelpers.infoAlert(result.mensaje);
             setIsModalFormOpen(false);
-
             return;
           }
           if (nuevo) setBusiness((prev) => [...prev, nuevo]);
@@ -129,13 +140,17 @@ export const Negocio = () => {
 
           setIsModalFormOpen(false);
         },
+        complete: () => {
+          setLoadingForm(false);
+        },
         error: errorHelpers.serverError,
       });
-
     } else {
-      notificationHelpers.warningAlert("Por favor valida los datos ingresados nuevamente");
+      setLoadingForm(false);
+      notificationHelpers.warningAlert(
+        "Por favor valida los datos ingresados nuevamente"
+      );
     }
-
   };
   //#endregion
 
@@ -148,6 +163,7 @@ export const Negocio = () => {
 
   const handleSaveBusiness = (updatedData: DTO_Negocio) => {
     if (!rowBusinessSelected) return;
+    setLoadingForm(true);
     updatedData.iD_Negocio = rowBusinessSelected.iD_Negocio;
     updatedData.iD_Usuario = user?.iD_Usuario || 0;
 
@@ -156,12 +172,13 @@ export const Negocio = () => {
     }
 
     validacion = valida_DTO_Negocio.validar(updatedData, "U");
-    setErroresValidacion(validacion)
+    setErroresValidacion(validacion);
     if (validacion.length === 0) {
-
       negocioService.actualizarNegocio(updatedData).subscribe({
         next: (result: DTO_Respuesta) => {
-          setBusiness((prev) => updateItemById(prev, updatedData, "iD_Negocio"));
+          setBusiness((prev) =>
+            updateItemById(prev, updatedData, "iD_Negocio")
+          );
           notificationHelpers.successAlert(result.mensaje);
           setShowModalUpdateBusiness(false);
           //Actualizamos la lista de negocios con los nuevos datos
@@ -170,11 +187,16 @@ export const Negocio = () => {
             setNegocio(updatedData);
           }
         },
-
+        complete: () => {
+          setLoadingForm(false);
+        },
         error: errorHelpers.serverError,
       });
     } else {
-      notificationHelpers.warningAlert("Por favor valida los datos ingresados nuevamente");
+      setLoadingForm(false);
+      notificationHelpers.warningAlert(
+        "Por favor valida los datos ingresados nuevamente"
+      );
     }
   };
   //#endregion
@@ -217,8 +239,8 @@ export const Negocio = () => {
               setNegocio(
                 state.listaNegocios.length > 1
                   ? state.listaNegocios.find(
-                    (n) => n.iD_Negocio !== businessToDelete.iD_Negocio
-                  ) ?? null
+                      (n) => n.iD_Negocio !== businessToDelete.iD_Negocio
+                    ) ?? null
                   : null
               );
             }
@@ -251,7 +273,7 @@ export const Negocio = () => {
     }
     setIsConfirmOpen(false);
     setConfirmContext(null);
-    setErroresValidacion([])
+    setErroresValidacion([]);
   };
   //#endregion
 
@@ -264,7 +286,10 @@ export const Negocio = () => {
       type: "custom",
       renderer: () => (
         <>
-          <p className=".text-gray-700">Cada referencia configurada se solicitará al momento de crear una orden de servicio para este negocio</p>
+          <p className=".text-gray-700">
+            Cada referencia configurada se solicitará al momento de crear una
+            orden de servicio para este negocio
+          </p>
           <ReferenciasJsonInput
             value={formData.referenciaJSON}
             onChange={(val) =>
@@ -291,7 +316,10 @@ export const Negocio = () => {
       type: "custom",
       renderer: () => (
         <>
-          <p className=".text-gray-700">Cada referencia configurada se solicitará al momento de crear una orden de servicio para este negocio</p>
+          <p className=".text-gray-700">
+            Cada referencia configurada se solicitará al momento de crear una
+            orden de servicio para este negocio
+          </p>
           <ReferenciasJsonInput
             hideCheckbox={true}
             editable={false}
@@ -398,29 +426,31 @@ export const Negocio = () => {
           fields={infoModalFields}
         />
 
-        <GenericFormModal
-          title="Registrar Negocio"
-          show={isModalFormOpen}
-          onHide={handleCancel}
-          data={formData}
-          setData={setFormData}
-          onSubmit={handleSave}
-          fields={newFormFields}
-          erroresValidacion={erroresValidacion}
-          onEliminarError={eliminarError}
-        />
+      <GenericFormModal
+        title="Registrar Negocio"
+        show={isModalFormOpen}
+        loading={loadingForm}
+        onHide={handleCancel}
+        data={formData}
+        setData={setFormData}
+        onSubmit={handleSave}
+        fields={newFormFields}
+        erroresValidacion={erroresValidacion}
+        onEliminarError={eliminarError}
+      />
 
-        <GenericFormModal
-          title="Editar datos del Negocio"
-          show={showModalUpdateBusiness}
-          onHide={() => setShowModalUpdateBusiness(false)}
-          data={editData!}
-          setData={(x) => setEditData(x as DTO_Negocio)}
-          onSubmit={() => editData && handleSaveBusiness(editData)}
-          fields={editFormFields}
-          erroresValidacion={erroresValidacion}
-          onEliminarError={eliminarError}
-        />
+      <GenericFormModal
+        title="Editar datos del Negocio"
+        show={showModalUpdateBusiness}
+        loading={loadingForm}
+        onHide={() => setShowModalUpdateBusiness(false)}
+        data={editData!}
+        setData={(x) => setEditData(x as DTO_Negocio)}
+        onSubmit={() => editData && handleSaveBusiness(editData)}
+        fields={editFormFields}
+        erroresValidacion={erroresValidacion}
+        onEliminarError={eliminarError}
+      />
 
         <ConfirmModal
           show={isConfirmOpen}

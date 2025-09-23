@@ -1,6 +1,6 @@
 import { useGenericForm } from "@/hooks/useGenericForm";
 import { FieldConfig } from "../../types/types";
-import { DynamicButtonConfig, ModalHeaderButtons } from "@/components";
+import { DecimalInput, DynamicButtonConfig, ModalHeaderButtons } from "@/components";
 import { DTO_Param } from "@/models";
 import { useScrollLockSmart } from "@/hooks/useScrollLockSmart";
 import { useEffect, useRef } from "react";
@@ -17,6 +17,7 @@ interface GenericFormModalProps<T> {
   headerButtons?: DynamicButtonConfig[];
   erroresValidacion?: Array<DTO_Param>;
   onEliminarError: (key: string) => void;
+  loading?: boolean;
 }
 //#endregion
 
@@ -31,6 +32,7 @@ export const GenericFormModal = <T,>({
   fields,
   headerButtons,
   erroresValidacion = [],
+  loading = false,
   onEliminarError,
 }: GenericFormModalProps<T>) => {
   //#region HOOKS
@@ -52,7 +54,7 @@ export const GenericFormModal = <T,>({
   });
 
   useEffect(() => {
-    if (show) modalRef.current?.focus();
+    if (show) modalRef.current?.focus();    
   }, [show]);
   //#endregion
 
@@ -274,21 +276,31 @@ export const GenericFormModal = <T,>({
         <label htmlFor={String(key)} className={labelClass}>
           {label}
         </label>
-        <input
-          id={String(key)}
-          type={type}
-          className={inputClass}
-          value={
-            type === "number"
-              ? String(localVal ?? rawVal ?? "")
-              : String(rawVal ?? "")
-          }
-          onChange={(e) => {
-            onEliminarError(key.toString());
-            handleChange(key, e.target.value, type);
-          }}
-          onBlur={() => handleBlur(key)}
-        />
+        {type === "number" ? (
+          <DecimalInput
+            id={String(key)}
+            className={inputClass}
+            value={String(localVal ?? rawVal ?? "")}
+            onChange={(val: string) => {
+              onEliminarError(key.toString());
+              handleChange(key, val, type);
+            }}
+            onBlur={() => handleBlur(key)}
+          />
+        ) : (
+            // type text
+          <input
+            id={String(key)}
+            type={type}
+            className={inputClass}
+            value={String(rawVal ?? "")}
+            onChange={(e) => {
+              onEliminarError(key.toString());
+              handleChange(key, e.target.value, type);
+            }}
+            onBlur={() => handleBlur(key)}
+          />
+        )}
         {/* sección de errores personalizados */}
         {erroresValidacion
           .filter((error) => error.nombre === String(key))
@@ -353,13 +365,19 @@ export const GenericFormModal = <T,>({
             <div className="card-footer d-flex justify-content-end gap-2 px-4">
               <button
                 type="button"
+                disabled={loading}
                 className="btn btn-secondary"
                 onClick={onHide}
               >
                 Cancelar
               </button>
-              <button type="submit" className="btn btn-primary">
-                Guardar
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>}
+                {loading ? "Guardando..." : "Guardar"}
               </button>
             </div>
           </form>

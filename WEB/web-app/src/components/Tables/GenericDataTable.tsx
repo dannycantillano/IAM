@@ -252,8 +252,6 @@ function GenericDataTableInner<T>(
     });
   };
 
-
-
   const dtColumns = useMemo<ColumnSettings[]>(() => {
     const cols: ColumnSettings[] = [];
 

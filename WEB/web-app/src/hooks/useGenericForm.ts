@@ -1,4 +1,5 @@
-import { FieldConfig, FieldType } from "@/components";
+
+import { FieldConfig, FieldType } from "@/types/types";
 import { useState, useEffect, useMemo, useCallback } from "react";
 
 type FormState<T> = {
@@ -28,11 +29,12 @@ export function useGenericForm<T>(
         const initDisp = {} as Record<keyof T, string>;
 
         fields.forEach(({ key, type }) => {
-            initErr[key] = "";
-            initTouch[key] = false;
-            const raw = data[key];
-            if (type === "number") initDisp[key] = raw != null ? String(raw) : "";
-            else if (type === "date") initDisp[key] = typeof raw === "string" ? raw.slice(0, 10) : "";
+            const typedKey = key as keyof T;
+            initErr[typedKey] = "";
+            initTouch[typedKey] = false;
+            const raw = data[typedKey];
+            if (type === "number") initDisp[typedKey] = raw != null ? String(raw) : "";
+            else if (type === "date") initDisp[typedKey] = typeof raw === "string" ? raw.slice(0, 10) : "";
         });
 
         setErrors(initErr);
@@ -117,7 +119,7 @@ export function useGenericForm<T>(
     const handleChange = useCallback(
         (key: keyof T, raw: string, type: FieldType) => {
             let newVal: unknown = raw;
-            if (type === "number") newVal = parseFloat(raw.replace(/,/g, "")) || 0;
+            if (type === "number") newVal = parseFloat(raw.replace(/,/g, "")) || "";
             else if (type === "date") newVal = raw;
 
             setData(prev => ({ ...prev, [key]: newVal } as T));
@@ -142,9 +144,10 @@ export function useGenericForm<T>(
         const newTouch = {} as Record<keyof T, boolean>;
 
         fields.forEach(f => {
-            newTouch[f.key] = true;
-            const msg = validate(f.key, data[f.key]);
-            newErr[f.key] = msg;
+            const key = f.key as keyof T;
+            newTouch[key] = true;
+            const msg = validate(key, data[key]);
+            newErr[key] = msg;
             if (msg) hasError = true;
         });
 

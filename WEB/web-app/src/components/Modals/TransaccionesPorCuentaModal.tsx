@@ -73,6 +73,7 @@ export const TransaccionesPorCuentaModal = ({
 
   //#region 🔄 Estados generales
   const [loading, setLoading] = useState(false);
+  const [loadingForm, setLoadingForm] = useState(false);
   const [transacciones, setTransacciones] = useState<DTO_Transacciones[]>([]);
   //#endregion
 
@@ -138,10 +139,7 @@ export const TransaccionesPorCuentaModal = ({
   };
 
   const handleSave = () => {
-
-
-
-
+    setLoadingForm(true);
     const payload: DTO_Transacciones = {
       ...formData,
       iD_Negocio: negocioId,
@@ -165,14 +163,16 @@ export const TransaccionesPorCuentaModal = ({
           if (nueva) setTransacciones((prev) => [...prev, nueva]);
 
           //Lógica para sumar a los campos calculados
-          actualizarCamposCalculadosCuenta(transacciones.reduce((suma, t) => suma + (Number(t?.monto) || 0), 0) + nueva.monto);
+          actualizarCamposCalculadosCuenta(transacciones.reduce((suma, t) => suma + (Number(t?.monto) || 0), 0) + (Number(nueva.monto) || 0));
 
           notificationHelpers.successAlert(result.mensaje);
           setIsModalFormOpen(false);
         },
         error: errorHelpers.serverError,
+        complete: () => setLoadingForm(false),
       });
     } else {
+      setLoadingForm(false);
       notificationHelpers.warningAlert("Por favor valida los datos ingresados nuevamente");
     }
   };
@@ -199,6 +199,7 @@ export const TransaccionesPorCuentaModal = ({
   const handleSaveEdit = (updated: DTO_Transacciones) => {
     if (!rowEditSelected) return;
 
+    setLoadingForm(true);
     updated.iD_Transaccion = rowEditSelected.iD_Transaccion;
     updated.iD_Negocio = negocioId;
 
@@ -221,12 +222,20 @@ export const TransaccionesPorCuentaModal = ({
           setTransacciones((prev) =>
             updated.estado?.iD_Estado !== STATUS_TBL.TRANSACTION.DELETED
               ? prev.map((t) =>
-                t.iD_Transaccion === updated.iD_Transaccion ? updated : t
-              )
+                  t.iD_Transaccion === updated.iD_Transaccion ? updated : t
+                )
               : prev.filter((t) => t.iD_Transaccion !== updated.iD_Transaccion)
           );
-          
-          actualizarCamposCalculadosCuenta(transacciones.reduce((acc, t) => t.iD_Transaccion === updated.iD_Transaccion ? acc : acc + (Number(t?.monto) || 0),Number(updated?.monto) || 0));
+
+          actualizarCamposCalculadosCuenta(
+            transacciones.reduce(
+              (acc, t) =>
+                t.iD_Transaccion === updated.iD_Transaccion
+                  ? acc
+                  : acc + (Number(t?.monto) || 0),
+              Number(updated?.monto) || 0
+            )
+          );
 
           notificationHelpers.successAlert(
             "Transacción actualizada correctamente"
@@ -234,8 +243,10 @@ export const TransaccionesPorCuentaModal = ({
           setShowEditForm(false);
         },
         error: errorHelpers.serverError,
+        complete: () => setLoadingForm(false),
       });
     } else {
+      setLoadingForm(false);
       notificationHelpers.warningAlert("Por favor valida los datos ingresados nuevamente");
     }
 
@@ -252,6 +263,7 @@ export const TransaccionesPorCuentaModal = ({
 
   const handleConfirmDelete = (action: boolean | null) => {
     if (action && transToDelete) {
+      setLoadingForm(true);
       const updated = {
         ...transToDelete,
         estado: {
@@ -265,9 +277,10 @@ export const TransaccionesPorCuentaModal = ({
       transaccionesService.actualizarTransaccion(updated).subscribe({
         next: () => {
           notificationHelpers.infoAlert("Transacción eliminada");
-          actualizarCamposCalculadosCuenta(transacciones.reduce((suma, t) => suma + (Number(t?.monto) || 0), 0) - updated.monto);
+          actualizarCamposCalculadosCuenta(transacciones.reduce((suma, t) => suma + (Number(t?.monto) || 0), 0) - (Number(updated.monto) || 0));
         },
         error: errorHelpers.serverError,
+        complete: () => setLoadingForm(false),
       });
       setTransToDelete(null);
     }
@@ -408,6 +421,7 @@ export const TransaccionesPorCuentaModal = ({
               }
               show={isModalFormOpen}
               onHide={handleCancelAdd}
+              loading={loadingForm}
               data={formData}
               setData={setFormData}
               onSubmit={handleSave}
@@ -420,6 +434,7 @@ export const TransaccionesPorCuentaModal = ({
               title="Editar Transacción"
               show={showEditForm}
               onHide={() => setShowEditForm(false)}
+              loading={loadingForm}
               data={editData!}
               setData={(x) => setEditData(x as DTO_Transacciones)}
               onSubmit={() => editData && handleSaveEdit(editData)}

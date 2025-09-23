@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { ConfirmModal } from "../modals/ConfirmModal";
 import { DTO_DetalleCuentaJSON, DTO_Param } from "@/models";
 import { DTO_Fila_Detalle } from "@/models/DTO_Fila_Detalle";
 import { formatColones } from "@/utils";
+import { ConfirmModal } from "../modals";
+import { DecimalInput } from "./DecimalInput";
 
 interface Props {
   value?: DTO_DetalleCuentaJSON;
@@ -25,7 +26,7 @@ export const DetalleCuentaInput = ({
   const [filas, setFilas] = useState<DTO_Fila_Detalle[]>([]);
   const [nombreFila, setNombreFila] = useState("");
   const [valorFila, setValorFila] = useState("");
-  const [cantidadFila, setCantidadFila] = useState("");
+  const [cantidadFila, setCantidadFila] = useState<string>("1");
 
   const [descuento, setDescuento] = useState<DTO_Param>({
     nombre: "Monto",
@@ -114,17 +115,19 @@ export const DetalleCuentaInput = ({
     if (nombreFila && valorFila && !isNaN(parseFloat(valorFila))) {
       setFilas([
         ...filas,
-        { nombre: nombreFila, valor: valorFila, cantidad: cantidadFila || "1" },
+        {
+          nombre: nombreFila,
+          valor: valorFila,
+          cantidad: (cantidadFila || "1").toString(),
+        },
       ]);
-      setNombreFila("");
-      setValorFila("");
-      setCantidadFila("");
+      limpiarCampos();
     }
   };
   const limpiarCampos = () => {
     setNombreFila("");
     setValorFila("");
-    setCantidadFila("");
+    setCantidadFila("1");
   };
 
   const eliminarFila = (index: number) => {
@@ -222,33 +225,6 @@ export const DetalleCuentaInput = ({
                 </span>
               </div>
             )}
-            {/* {filas.map((item, idx) => (
-              <div
-                key={idx}
-                className="d-flex justify-content-between align-items-center py-2 px-3 mb-2 rounded bg-light"
-              >
-                <div>
-                  <span className="">{item.nombre}</span>
-                  <span className="mx-2 text-secondary">|</span>
-                  <span className="text-success">
-                    ₡
-                    {parseFloat(item.valor).toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={() => eliminarFila(idx)}
-                  title="Eliminar"
-                >
-                  <i className="bi bi-trash" />
-                </button>
-              </div>
-            ))} */}
-
             {filas.length > 0 && (
               <div>
                 <table
@@ -382,20 +358,13 @@ export const DetalleCuentaInput = ({
             <div className="row g-2 align-items-end mt-1">
               {/* XS: 5/12 — SM: 4/12 — MD: 3/12 */}
               <div className="col-5 col-sm-4 col-md-4">
-                <input
-                  type="text"
+                <DecimalInput
                   className="form-control"
                   placeholder="Monto"
                   value={valorFila}
-                  onChange={(e) => {
-                    const v = e.target.value
-                      .replace(/[^\d.,]/g, "") // deja dígitos y . ,
-                      .replace(",", ".") // normaliza coma a punto
-                      .replace(/(\..*)\./g, "$1"); // solo un punto decimal
+                  onChange={(v: string) => {
                     setValorFila(v);
                   }}
-                  inputMode="numeric"
-                  pattern="^\d+$"
                 />
               </div>
 
@@ -450,23 +419,12 @@ export const DetalleCuentaInput = ({
                   Descuento ({descuento.nombre === "Porcentaje" ? "%" : "₡"})
                 </label>
                 <div className="input-group">
-                  <input
-                    type="number"
-                    placeholder="0.00"
-                    className="form-control"
+                  <DecimalInput
                     value={descuento.valor}
-                    onChange={(e) => {
-                      let val = e.target.value;
-                      if (descuento.nombre === "Porcentaje") {
-                        if (parseFloat(val) > 100) val = "100";
-                        if (parseFloat(val) < 0) val = "0";
-                      } else {
-                        if (parseFloat(val) < 0) val = "0";
-                      }
+                    onChange={(val: string) => {
                       setDescuento({ ...descuento, valor: val });
                     }}
-                    min="0"
-                    {...(descuento.nombre === "Porcentaje" ? { max: 100 } : {})}
+                    percentage={descuento.nombre === "Porcentaje"}
                   />
                   <button
                     type="button"
@@ -479,15 +437,25 @@ export const DetalleCuentaInput = ({
                       setDescuento((prev) => ({
                         nombre:
                           prev.nombre === "Porcentaje" ? "Monto" : "Porcentaje",
-                        valor: "0",
+                        valor: "",
                       }))
                     }
                     title="Cambiar tipo"
                   >
                     {descuento.nombre === "Porcentaje" ? "%" : "₡"}
-                    <span className="pulse-ring" />
+                    <span
+                      className={
+                        descuento.nombre === "Porcentaje"
+                          ? "pulse-ring border-5"
+                          : "pulse-ring border-5"
+                      }
+                    />
                   </button>
                 </div>
+                <span className="text-muted small">
+                  Tipo:{" "}
+                  {descuento.nombre === "Porcentaje" ? "Porcentaje" : "Monto"}
+                </span>
               </div>
 
               <div className="col-12 col-md-6">

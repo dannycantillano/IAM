@@ -1,7 +1,6 @@
 // ✅ RP-06: ItemsOrdenDeServicioModal adaptado con manejo local sin refetch y estructura organizada
 
 import React, { useEffect, useRef, useState } from "react";
-import { GenericDataTable } from "@/components/tables/GenericDataTable";
 import { LoadingPanel } from "@/components/panels/LoadingPanel";
 import { CustomRange } from "@/components/ranges/CustomRange";
 import {
@@ -29,7 +28,8 @@ import {
   AsyncProformaSelect,
   AsyncTarifaSelect,
   ConfirmModal,
-  FieldConfig,
+  DecimalInput,
+  GenericDataTable,
   GenericFormModal,
   InfoModal,
   ProformaOption,
@@ -37,6 +37,7 @@ import {
 } from "@/components";
 import { valida_DTO_ItemOrdenServicio } from "@/validators/valida_DTO_ItemOrdenServicio";
 import { useScrollLockSmart } from "@/hooks";
+import { FieldConfig } from "@/types/types";
 
 interface ItemsOrdenDeServicioModalProps {
   open: boolean;
@@ -86,7 +87,7 @@ export const ItemsOrdenDeServicioModal = ({
     useState<TarifarioOption | null>(null);
   const [proformaSeleccionada, setProformaSeleccionada] =
     useState<ProformaOption | null>(null);
-  const [reloadKey, setReloadKey] = useState(0);
+  const [reloadKey] = useState(0);
   //#endregion
 
   //#region ℹ️ info Modal estados;
@@ -714,37 +715,36 @@ export const ItemsOrdenDeServicioModal = ({
 
                                         <div className="col-3">
                                           <label
-                                            htmlFor={
-                                              "txtPrecio" + idx.toString()
-                                            }
-                                            className="fs-7 text-gray-600"
+                                          htmlFor={
+                                            "txtPrecio" + idx.toString()
+                                          }
+                                          className="fs-7 text-gray-600"
                                           >
-                                            Monto
+                                          Monto
                                           </label>
-                                          <input
-                                            type="number"
-                                            className={`form-control form-control-sm 
-                                            ${
-                                              valida_DTO_ItemOrdenServicio
-                                                .validar(it, "C")
-                                                .filter(
-                                                  (error) =>
-                                                    error.nombre ===
-                                                    String("monto")
-                                                ).length > 0
-                                                ? "border-danger"
-                                                : ""
-                                            }`}
-                                            placeholder="0.00"
-                                            value={it.monto}
-                                            onChange={(e) =>
-                                              handleChange(
-                                                idx,
-                                                "monto",
-                                                e.target.value
-                                              )
-                                            }
-                                            key={"txtPrecio" + idx.toString()}
+                                          <DecimalInput
+                                          className={`form-control form-control-sm 
+                                          ${
+                                            valida_DTO_ItemOrdenServicio
+                                            .validar(it, "C")
+                                            .filter(
+                                              (error) =>
+                                              error.nombre ===
+                                              String("monto")
+                                            ).length > 0
+                                            ? "border-danger"
+                                            : ""
+                                          }`}
+                                          placeholder="0.00"
+                                          value={it.monto}
+                                          onChange={(value) =>
+                                            handleChange(
+                                            idx,
+                                            "monto",
+                                            value
+                                            )
+                                          }
+                                          key={"txtPrecio" + idx.toString()}
                                           />
                                         </div>
 

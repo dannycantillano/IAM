@@ -4,6 +4,7 @@ import {
   AsyncClientSelect,
   AsyncTarifaSelect,
   ClientOption,
+  DecimalInput,
   Stepper,
   TarifarioOption,
 } from "@/components";
@@ -17,10 +18,17 @@ import {
   DTO_Estado,
   DTO_Param,
 } from "@/models";
-import { calcularTotales, TipoDescuento } from "@/utils/profromasHelpers";
-import { formatColones, notificationHelpers, procesarRespuesta } from "@/utils";
-import { proformaService } from "@/services/proformas.service";
-import { items_proformaService } from "@/services";
+import {
+  formatColones,
+  notificationHelpers,
+  procesarRespuesta,
+  calcularTotales,
+  TipoDescuento
+} from "@/utils";
+import {
+  items_proformaService,
+  proformaService
+} from "@/services";
 import { valida_DTO_Items_y_Proformas } from "@/validators/valida_DTO_Items_y_Proformas";
 import { useScrollLockSmart } from "@/hooks";
 
@@ -33,14 +41,8 @@ type Props = {
   show: boolean;
   mode: Mode;
   onClose: () => void;
-
-  /** Solo para edición: suficiente pasar la fila de proforma */
   proforma?: DTO_Proforma | null;
-
-  /** Opcional en edición: si ya tienes los items cargados en el padre, pásalos y se evita el fetch */
   itemsIniciales?: DTO_ProformaItem[] | null;
-
-  /** Callbacks */
   onRegistered?: (nuevaProforma: DTO_Proforma) => void;
   onUpdated?: (proformaActualizada: DTO_Proforma) => void;
 };
@@ -100,6 +102,8 @@ export const ProformaCrearEditarModal = (props: Props) => {
     dayjs().add(15, "day").format("YYYY-MM-DD")
   );
 
+  const [loadingForm, setLoadingForm] = useState(false);
+
   // #region Validaciones en los formularios
   const [erroresValidacion, setErroresValidacion] = useState<DTO_Param[]>([]);
   const eliminarError = (campo: string) => {
@@ -112,6 +116,7 @@ export const ProformaCrearEditarModal = (props: Props) => {
   };
   const getErrors = (campo: string) =>
     erroresValidacion.filter((e) => e.nombre === campo);
+
   const focusByErrKey = (key: string) => {
     const el = document.querySelector<HTMLElement>(`[data-err="${key}"]`);
     if (el) {
@@ -572,6 +577,7 @@ export const ProformaCrearEditarModal = (props: Props) => {
       notificationHelpers.warningAlert("Agregue al menos un ítem.");
       return;
     }
+    setLoadingForm(true);
 
     const dtoCabecera: DTO_Proforma = {
       iD_Proforma: mode === "edit" ? Number(proforma?.iD_Proforma ?? 0) : 0,
@@ -597,6 +603,7 @@ export const ProformaCrearEditarModal = (props: Props) => {
     const errs = runValidations(dtoCabecera);
     setErroresValidacion(errs);
     if (errs.length > 0) {
+      setLoadingForm(false);
       notificationHelpers.warningAlert(
         "Por favor corrige los campos marcados."
       );
@@ -630,9 +637,10 @@ export const ProformaCrearEditarModal = (props: Props) => {
             .toPromise();
           if (!r2?.tipoRespuesta)
             throw new Error(r2?.mensaje ?? "Error al registrar item.");
+          setLoadingForm(false);
         }
-
         notificationHelpers.successAlert("Proforma registrada correctamente.");
+        setLoadingForm(false);
         const nuevaProforma = {
           ...parsed,
           cliente: { nombreCliente: clienteOpt?.label ?? "" } as any,
@@ -650,11 +658,14 @@ export const ProformaCrearEditarModal = (props: Props) => {
       }
 
       // ===== EDITAR =====
+      setLoadingForm(true);
       const r0 = await proformaService
         .actualizarProformas(dtoCabecera)
         .toPromise();
-      if (!r0?.tipoRespuesta)
+      if (!r0?.tipoRespuesta) {
+        setLoadingForm(false);
         throw new Error(r0?.mensaje ?? "Error al actualizar proforma.");
+      }
 
       const nuevos = items.filter((i) => i._isNew && !i._deleted);
       const modificados = items.filter(
@@ -732,8 +743,10 @@ export const ProformaCrearEditarModal = (props: Props) => {
       };
 
       notificationHelpers.successAlert("Proforma actualizada correctamente.");
+      setLoadingForm(false);
       onUpdated?.(proformaActualizadaParaTabla);
     } catch (err: any) {
+      setLoadingForm(false);
       notificationHelpers.errorAlert(
         err?.message ?? "Ocurrió un error al guardar."
       );
@@ -830,7 +843,7 @@ export const ProformaCrearEditarModal = (props: Props) => {
   const NombreSeguro = (name: string) =>
     name.replace(/[\\/:*?"<>|]+/g, "").slice(0, 80);
 
-  // Steps (
+  //#region Steps (
   const steps = [
     {
       title: "Encabezado",
@@ -887,7 +900,6 @@ export const ProformaCrearEditarModal = (props: Props) => {
           return errs; // Si no hay ítems, no tiene sentido validar cada uno
         }
 
-       
         for (const it of itemsVigentes) {
           const dtoItem: DTO_ProformaItem = {
             iD_ProformaItem: Number(it.iD_ProformaItem ?? 0),
@@ -970,41 +982,36 @@ export const ProformaCrearEditarModal = (props: Props) => {
                     role="tabpanel"
                   >
                     <div
-                      className="px-4 mt-5 d-flex justify-content-between align-items-center pb-2 sticky-top bg-white border-0 shadow-sm-on-scroll"
+                      className="d-flex justify-content-between align-items-center border-bottom px-4 py-3"
                       style={{
                         position: "sticky",
-                        top: "0",
+                        top: 0,
                         background: "white",
+                        zIndex: 10,
                       }}
                     >
-                      <div
-                        className="d-flex align-items-center justify-content-between gap-2 text-muted small flex-wrap"
-                        style={{ width: "100%" }}
-                      >
-                        <div
-                          className="d-flex align-items-center gap-2 flex-grow-1"
-                          style={{ minWidth: 0 }}
+                      {/* Texto informativo */}
+                      <div className="d-flex align-items-start gap-2 flex-grow-1">
+                        <i className="fa fa-info-circle text-muted mt-1" />
+                        <span
+                          className="text-muted small"
+                          style={{ textAlign: "justify" }}
                         >
-                          <i className="fa fa-info-circle" />
-                          <span
-                            style={{ textAlign: "justify", display: "block" }}
-                          >
-                            El botón <strong>Agregar ítem</strong> crea filas
-                            vacías para que puedas llenarlas manualmente. Si
-                            deseas agregar ítems automáticamente, utiliza la
-                            pestaña <strong>Tarifario</strong>.
-                          </span>
-                        </div>
-                        <div>
-                          <button
-                            className="btn btn-light-primary btn-sm"
-                            onClick={addItemVacio}
-                            style={{ whiteSpace: "nowrap" }}
-                          >
-                            Agregar ítem
-                          </button>
-                        </div>
+                          El botón <strong>Agregar ítem</strong> crea filas
+                          vacías para que puedas llenarlas manualmente. Si
+                          deseas agregar ítems automáticamente, utiliza la
+                          pestaña <strong>Tarifario</strong>.
+                        </span>
                       </div>
+                    </div>
+                    {/* Botón a la derecha */}
+                    <div className="d-flex justify-content-end ms-auto mt-3 me-4">
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={addItemVacio}
+                      >
+                        Agregar ítem
+                      </button>
                     </div>
                   </div>
 
@@ -1029,13 +1036,7 @@ export const ProformaCrearEditarModal = (props: Props) => {
                         style={{ zIndex: 1061 }}
                       >
                         {negocio && (
-                          <div
-                            style={{
-                              minWidth: 220,
-                              maxWidth: 320,
-                              width: "100%",
-                            }}
-                          >
+                          <div className="d-flex row justify-content-end ms-auto">
                             <label className="form-label">
                               Seleccionar Tarifa
                             </label>
@@ -1180,51 +1181,24 @@ export const ProformaCrearEditarModal = (props: Props) => {
                             {/* Precio */}
                             <td className="text-end align-top">
                               <div className="text-start">
-                                <input
-                                  type="number"
-                                  inputMode="decimal"
-                                  step="1"
+                                <DecimalInput
+                                  required
+                                  value={it.precioItemProforma}
                                   min={0}
-                                  placeholder="0" // 👈 solo se ve cuando el campo está vacío
-                                  className={`form-control text-muted form-control-sm text-end ${
+                                  onChange={(num) => {
+                                    patchItem(it.idTemp, {
+                                      precioItemProforma:
+                                        typeof num === "string"
+                                          ? parseFloat(num)
+                                          : num,
+                                    });
+                                  }}
+                                  className={`form-control-sm ${
                                     getErrors(`${it.idTemp}.precioItemProforma`)
                                       .length
                                       ? "is-invalid"
                                       : ""
                                   }`}
-                                  value={
-                                    it.precioItemProforma === undefined ||
-                                    it.precioItemProforma === null
-                                      ? "" // 👈 vacío, muestra el placeholder
-                                      : String(it.precioItemProforma)
-                                  }
-                                  data-err={`${it.idTemp}.precioItemProforma`}
-                                  onChange={(e) => {
-                                    const valStr = e.target.value
-                                      .replace(/[^\d.]/g, "")
-                                      .replace(",", ".")
-                                      .replace(/(\..*?)\..*/g, "$1")
-                                      .replace(/^0+(?=\d)/, "");
-
-                                    eliminarError(
-                                      `${it.idTemp}.precioItemProforma`
-                                    );
-
-                                    if (valStr === "") {
-                                      patchItem(it.idTemp, {
-                                        precioItemProforma: undefined,
-                                      });
-                                      return;
-                                    }
-
-                                    const valNum = parseFloat(valStr);
-                                    if (!isNaN(valNum) && valNum >= 0) {
-                                      patchItem(it.idTemp, {
-                                        precioItemProforma: valNum,
-                                      });
-                                    }
-                                  }}
-                                  disabled={it._deleted}
                                 />
                                 {getErrors(
                                   `${it.idTemp}.precioItemProforma`
@@ -1752,7 +1726,7 @@ export const ProformaCrearEditarModal = (props: Props) => {
       ),
     },
   ];
-
+  //#endregion
   if (!show) return null;
 
   return (
@@ -1794,6 +1768,7 @@ export const ProformaCrearEditarModal = (props: Props) => {
               {/* Cabecera */}
               <Stepper
                 steps={steps}
+                loading={loadingForm}
                 onSubmit={handleGuardar}
                 setErroresValidacion={setErroresValidacion}
                 focusByErrKey={focusByErrKey}

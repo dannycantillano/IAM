@@ -6,7 +6,7 @@ export class DTO_ItemOrdenServicio {
     estado: DTO_Estado = new DTO_Estado();
     nombreItemOrdenServicio: string = '';
     descripcion: string = '';
-    monto: number = 0;
+    monto: number | undefined = undefined;
     avance: number = 0;
     cantidad: number = 1;
 }

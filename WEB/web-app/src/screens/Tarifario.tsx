@@ -43,27 +43,28 @@ export const Tarifario = () => {
 
   //#region 🔄 Estado general
   const [loading, setLoading] = useState(false);
+  const [loadingForms, setLoadingForms] = useState(false);
   const [tarifas, setTarifas] = useState<DTO_Tarifa[]>([]);
 
   //#endregion
 
-  //#region ℹ️ info Modal estados;
+  //#region ℹ️ info Modal states;
   const [rowTableSelected, setRowTableSelected] = useState<DTO_Tarifa>();
   //#endregion
 
-  //#region ➕ Registrar
+  //#region ➕ Registrar: state
   const [isRegisterFormOpen, setIsRegisterFormOpen] = useState(false);
   const [registerFormData, setRegisterFormData] = useState<DTO_Tarifa>(
     new DTO_Tarifa()
   );
   //#endregion
 
-  //#region ✏️ Editar
+  //#region ✏️ Editar: state
   const [showEditForm, setShowEditForm] = useState(false);
   const [editData, setEditData] = useState<DTO_Tarifa>(new DTO_Tarifa());
   //#endregion
 
-  //#region Estados para el modal de confirmación de eliminación
+  //#region States para el modal de confirmación de eliminación
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmModalMessage, setConfirmModalMessage] = useState<string>("");
   const [tarifaToDelete, setTarifaToDelete] = useState<DTO_Tarifa | null>(null);
@@ -117,6 +118,7 @@ export const Tarifario = () => {
       );
       return;
     }
+    setLoadingForms(true);
     const dataToRegister = {
       ...registerFormData,
       iD_Negocio: state.negocio.iD_Negocio,
@@ -143,8 +145,10 @@ export const Tarifario = () => {
           setIsRegisterFormOpen(false);
         },
         error: errorHelpers.serverError,
+        complete: () => setLoadingForms(false),
       });
     } else {
+      setLoadingForms(false);
       notificationHelpers.warningAlert(
         "Por favor valida los datos ingresados nuevamente"
       );
@@ -166,8 +170,8 @@ export const Tarifario = () => {
   };
 
   const handleSaveEdit = () => {
+    setLoadingForms(true);
     const updated = { ...editData };
-
     // Validar datos antes de guardar
     validacion = valida_DTO_Tarifas.validar(updated, "U");
     setErroresValidacion(validacion);
@@ -181,8 +185,10 @@ export const Tarifario = () => {
           setShowEditForm(false);
         },
         error: errorHelpers.serverError,
+        complete: () => setLoadingForms(false),
       });
     } else {
+      setLoadingForms(false);
       notificationHelpers.warningAlert(
         "Por favor valida los datos ingresados nuevamente"
       );
@@ -214,6 +220,7 @@ export const Tarifario = () => {
       setConfirmContext(null);
       return;
     }
+    setLoadingForms(true);
     tableRef.current?.removeById(tarifaToDelete.iD_Tarifa);
 
     const updated: DTO_Tarifa = {
@@ -229,14 +236,17 @@ export const Tarifario = () => {
         if (res?.codigo === "B037") {
           notificationHelpers.infoAlert("Tarifa eliminada correctamente");
         } else {
+          setLoadingForms(false);
           notificationHelpers.warningAlert(
             res?.mensaje || "No se pudo eliminar"
           );
         }
       },
       error: (err) => {
+        setLoadingForms(false);
         errorHelpers.serverError(err);
       },
+      complete: () => setLoadingForms(false),
     });
 
     setTarifaToDelete(null);
@@ -331,37 +341,38 @@ export const Tarifario = () => {
               fields={infoModalFields}
             />
 
-            <GenericFormModal
-              title="Registrar Tarifa"
-              show={isRegisterFormOpen}
-              onHide={handleCancelAdd}
-              data={registerFormData}
-              setData={setRegisterFormData}
-              onSubmit={handleSave}
-              fields={tarifaFormAddFields}
-              erroresValidacion={erroresValidacion}
-              onEliminarError={eliminarError}
-            />
-            <GenericFormModal
-              title="Editar Tarifa"
-              show={showEditForm}
-              onHide={() => setShowEditForm(false)}
-              data={editData}
-              setData={setEditData}
-              onSubmit={handleSaveEdit}
-              fields={tarifaFormEditFields}
-              erroresValidacion={erroresValidacion}
-              onEliminarError={eliminarError}
-            />
-
-            <ConfirmModal
-              show={isConfirmOpen}
-              confirmMessage={confirmModalMessage}
-              onAction={confirmModalAction}
-            />
-          </>
-        )}
-      </div>
+          <GenericFormModal
+            title="Registrar Tarifa"
+            show={isRegisterFormOpen}
+            onHide={handleCancelAdd}
+            loading={loadingForms}
+            data={registerFormData}
+            setData={setRegisterFormData}
+            onSubmit={handleSave}
+            fields={tarifaFormAddFields}
+            erroresValidacion={erroresValidacion}
+            onEliminarError={eliminarError}
+          />
+          <GenericFormModal
+            title="Editar Tarifa"
+            show={showEditForm}
+            onHide={() => setShowEditForm(false)}
+            loading={loadingForms}
+            data={editData}
+            setData={setEditData}
+            onSubmit={handleSaveEdit}
+            fields={tarifaFormEditFields}
+            erroresValidacion={erroresValidacion}
+            onEliminarError={eliminarError}
+          />
+          <ConfirmModal
+            show={isConfirmOpen}
+            confirmMessage={confirmModalMessage}
+            onAction={confirmModalAction}
+          />
+        </>
+      )}
+    </div>
     </>
   );
 };

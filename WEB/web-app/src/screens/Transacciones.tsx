@@ -58,6 +58,7 @@ export const Transacciones = () => {
   );
   const [transacciones, setTransacciones] = useState<DTO_Transacciones[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingForm, setLoadingForm] = useState(false);
   const [disableButtonAdd, setDisableButtonAdd] = useState(true);
   //#endregion
 
@@ -133,6 +134,7 @@ export const Transacciones = () => {
 
   const handleSave = () => {
     formData.iD_Negocio = selectedBusiness?.iD_Negocio || 0;
+    setLoadingForm(true);
 
     validacion = valida_DTO_Transacciones.validar(formData, "C");
     setErroresValidacion(validacion)
@@ -150,8 +152,10 @@ export const Transacciones = () => {
           setIsModalFormOpen(false);
         },
         error: errorHelpers.serverError,
+        complete: () => setLoadingForm(false),
       });
     } else {
+      setLoadingForm(false);
       notificationHelpers.warningAlert("Por favor valida los datos ingresados nuevamente");
     }
   };
@@ -175,6 +179,7 @@ export const Transacciones = () => {
 
   const handleSaveEdit = (updatedData: DTO_Transacciones) => {
     if (!rowEditSelected) return;
+    setLoadingForm(true);
     updatedData.iD_Transaccion = rowEditSelected.iD_Transaccion;
     updatedData.iD_Negocio = selectedBusiness?.iD_Negocio || 0;
 
@@ -205,8 +210,10 @@ export const Transacciones = () => {
           setShowEditModal(false);
         },
         error: errorHelpers.serverError,
+        complete: () => setLoadingForm(false),
       });
     } else {
+      setLoadingForm(false);
       notificationHelpers.warningAlert("Por favor valida los datos ingresados nuevamente");
     }
 
@@ -223,6 +230,7 @@ export const Transacciones = () => {
 
   const handleConfirmDelete = (action: boolean | null) => {
     if (action && transToDelete) {
+      setLoadingForm(true);
       const updated: DTO_Transacciones = {
         ...transToDelete,
         estado: {
@@ -240,6 +248,7 @@ export const Transacciones = () => {
           tableRef.current?.removeById(updated.iD_Transaccion);
         },
         error: errorHelpers.serverError,
+        complete: () => setLoadingForm(false),
       });
     }
     setIsConfirmOpen(false);
@@ -286,7 +295,7 @@ export const Transacciones = () => {
 
   //#region 🖼️ Custom Renderers
   const customRenderers = {
-    monto: (val: unknown) => formatColones(Number(val) || 0),
+    monto: (val: unknown) => formatColones(Number(val) || ""),
     fechaTransaccion: (val: unknown) =>
       val ? new Date(String(val)).toLocaleDateString() : "",
   };
@@ -364,17 +373,31 @@ export const Transacciones = () => {
           onEliminarError={eliminarError}
         />
 
-        <GenericFormModal<DTO_Transacciones>
-          title="Editar Transacción"
-          show={showEditModal}
-          onHide={() => setShowEditModal(false)}
-          data={editData!}
-          setData={(x) => setEditData(x as DTO_Transacciones)}
-          onSubmit={() => editData && handleSaveEdit(editData)}
-          fields={editFormFields}
-          erroresValidacion={erroresValidacion}
-          onEliminarError={eliminarError}
-        />
+      <GenericFormModal<DTO_Transacciones>
+        title="Registrar Transacción"
+        show={isModalFormOpen}
+        onHide={handleCancelAdd}
+        loading={loadingForm}
+        data={formData}
+        setData={setFormData}
+        onSubmit={handleSave}
+        fields={transaccionesFormEditFields}
+        erroresValidacion={erroresValidacion}
+        onEliminarError={eliminarError}
+      />
+
+      <GenericFormModal<DTO_Transacciones>
+        title="Editar Transacción"
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        loading={loadingForm}
+        data={editData!}
+        setData={(x) => setEditData(x as DTO_Transacciones)}
+        onSubmit={() => editData && handleSaveEdit(editData)}
+        fields={editFormFields}
+        erroresValidacion={erroresValidacion}
+        onEliminarError={eliminarError}
+      />
 
         <ConfirmModal
           show={isConfirmOpen}

@@ -12,37 +12,45 @@ type Step = {
 
 interface StepperProps {
   steps: Step[];
+  loading?: boolean;
   onSubmit?: () => void;
-  setErroresValidacion?: (errs: DTO_Param[]) => void; // <-- Añade esto
+  setErroresValidacion?: (errs: DTO_Param[]) => void;
   focusByErrKey?: (key: string) => void;
 }
 
-export const Stepper = ({ steps, onSubmit, setErroresValidacion, focusByErrKey }: StepperProps) => {
+export const Stepper = (props: StepperProps) => {
+  const {
+    steps,
+    onSubmit,
+    setErroresValidacion,
+    focusByErrKey,
+    loading = false,
+  } = props;
+
   const [currentStep, setCurrentStep] = useState(0);
 
   const goNext = () => {
+    const currentValidator = steps[currentStep]?.validator;
 
-     const currentValidator = steps[currentStep]?.validator;
+    if (currentValidator) {
+      const errors = currentValidator();
+      if (errors.length > 0) {
 
-  if (currentValidator) {
-    // Ejecuta la validación
-    const errors = currentValidator();
+        if (setErroresValidacion) {
+          setErroresValidacion(errors);
+        }
+        notificationHelpers.warningAlert(
+          errors[0]?.valor ||
+            "Por favor corrige los errores antes de continuar."
+        );
 
-    if (errors.length > 0) {
-      console.log("Errores de validación:", errors);
-      
-      if (setErroresValidacion) {
-        setErroresValidacion(errors);
+        if (errors[0] && focusByErrKey) {
+          focusByErrKey(errors[0].nombre);
+        }
+
+        return;
       }
-      notificationHelpers.warningAlert(errors[0]?.valor ||"Por favor corrige los errores antes de continuar.");
-
-      if (errors[0] && focusByErrKey) {
-        focusByErrKey(errors[0].nombre); 
-      }
-
-      return; // Detenemos la ejecución aquí
     }
-  }
     if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1);
     } else {
@@ -100,13 +108,36 @@ export const Stepper = ({ steps, onSubmit, setErroresValidacion, focusByErrKey }
         <button
           type="button"
           className="btn btn-light btn-active-light-primary"
+          disabled={loading || currentStep === 0}
           onClick={goBack}
-          disabled={currentStep === 0}
         >
+          {loading ? (
+            <span
+              className="spinner-border spinner-border-sm me-2"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          ) : (
+            <span className=""></span>
+          )}
           Atrás
         </button>
-          {steps[currentStep].children}
-        <button type="button" className="btn btn-primary" onClick={goNext}>
+        {steps[currentStep].children}
+        <button
+          type="button"
+          className="btn btn-primary"
+          disabled={loading}
+          onClick={goNext}
+        >
+          {loading ? (
+            <span
+              className="spinner-border spinner-border-sm me-2"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          ) : (
+            <span className=""></span>
+          )}
           {currentStep === steps.length - 1 ? "Guardar" : "Siguiente"}
         </button>
       </div>

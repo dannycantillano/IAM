@@ -5,7 +5,7 @@ export class DTO_Transacciones {
     iD_Negocio: number = 0;
     estado: DTO_Estado = new DTO_Estado();
     concepto: string = '';
-    monto: number = 0;
+    monto: number | undefined = undefined;
     tipo: string = '';
     numReferencia: string = '';
     tipoNumReferencia: string = '';

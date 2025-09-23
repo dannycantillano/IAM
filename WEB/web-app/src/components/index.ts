@@ -8,7 +8,7 @@ export * from "./orden";
 export * from "./panels";
 export * from "./ranges"
 export * from "./selects"
-export * from "./stepper"
-export * from "./tables";
+export * from "./Stepper"
+export * from "./Tables";
 export * from "./ui";
 export * from "./Toolbar"

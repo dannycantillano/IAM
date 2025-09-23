@@ -1,8 +1,5 @@
 //#region updateItemById: Actualiza o agrega un elemento en una lista por su id
 
-import { DTO_DetalleCuentaJSON } from "@/models";
-import { Console } from "console";
-
 /**
  * Actualiza un elemento en la lista si existe, comparando por la clave idKey.
  * Si no existe, agrega el elemento actualizado al final de la lista.

@@ -23,6 +23,7 @@ import {
 } from "@/utils";
 import {
   ConfirmModal,
+  DecimalInput,
   DetalleCuentaInput,
   DynamicButtonConfig,
   GenericDataTable,
@@ -73,6 +74,10 @@ export const Cuentas = () => {
   const [montoInput, setMontoInput] = useState<string>(
     formData.monto && formData.monto !== 0 ? String(formData.monto) : ""
   );
+  //#endregion
+
+  //#Region loadings
+  const [loadingForm, setLoadingForm] = useState<boolean>(false);
   //#endregion
 
   //#region ✏️ Editar cuenta - Estados
@@ -184,6 +189,7 @@ export const Cuentas = () => {
   };
 
   const handleSave = () => {
+    setLoadingForm(true);
     formData.iD_Negocio = selectedBusiness?.iD_Negocio || 0;
     const parsed = parseFloat(montoInput.replace(/[^0-9.]/g, ""));
     formData.monto = isNaN(parsed) ? 0 : parsed;
@@ -208,6 +214,7 @@ export const Cuentas = () => {
         complete: () => {
           setDetalleHabilitado(false);
           setMontoInput("");
+          setLoadingForm(false);
         },
       });
     } else {
@@ -242,8 +249,8 @@ export const Cuentas = () => {
 
   const handleSaveEdit = (updatedData: DTO_Cuenta) => {
 
-
     if (!rowEditSelected) return;
+    setLoadingForm(true);
     updatedData.iD_Cuenta = rowEditSelected.iD_Cuenta;
     updatedData.iD_Negocio = selectedBusiness?.iD_Negocio || 0;
 
@@ -272,6 +279,9 @@ export const Cuentas = () => {
           setShowEditModal(false);
         },
         error: (err) => errorHelpers.serverError(err),
+        complete: () => {
+          setLoadingForm(false);
+        },
       });
     } else {
       notificationHelpers.warningAlert(
@@ -294,6 +304,7 @@ export const Cuentas = () => {
 
   const handleConfirmDelete = (action: boolean | null) => {
     if (action && accountToDelete) {
+      setLoadingForm(true);
       const updatedData: DTO_Cuenta = {
         ...accountToDelete,
         estado: {
@@ -318,6 +329,7 @@ export const Cuentas = () => {
         },
         complete: () => {
           setShowEditModal(false);
+          setLoadingForm(false);
         },
       });
       setAccountToDelete(null);
@@ -428,38 +440,18 @@ export const Cuentas = () => {
       order: 7,
       renderer: () => {
         return (
-          <div className="input-group">
+            <div className="input-group">
             <span className="input-group-text">₡</span>
-            <input
-              type="number"
+            <DecimalInput
               className="form-control fw-bold fs-5 text-start"
               readOnly={detalleHabilitado}
               value={montoInput}
-              onFocus={() => {
-                if ((formData?.monto || 0) === 0 && montoInput === "0") {
-                  setMontoInput("");
-                }
-              }}
-              onChange={(e) => {
-                const val = e.target.value.replace(/[^0-9.]/g, "");
+              onChange={(val: string) => {
                 setMontoInput(val);
-                const num = parseFloat(val);
-                setFormData({ ...formData, monto: num });
+                setFormData({ ...formData, monto: isNaN(Number(val)) ? 0 : Number(val) });
               }}
-
-
-
-              onBlur={(e) => {
-                if (e.target.value === "" || isNaN(Number(e.target.value))) {
-                  setMontoInput("");
-                  setFormData({ ...formData, monto: 0 });
-                }
-              }}
-              placeholder="0.00"
-              min={0}
-              step={0.01}
             />
-          </div>
+            </div>
         );
       },
     },
@@ -550,49 +542,34 @@ export const Cuentas = () => {
         return (
           <div className="input-group">
             <span className="input-group-text">₡</span>
-            <input
-              type="text"
-              className={`form-control fw-bold fs-5 text-start ${detalleHabilitado ? "bg-light" : ""
-                }`}
+            <DecimalInput
+              className={`form-control fw-bold fs-5 text-start ${
+                detalleHabilitado ? "bg-light" : ""
+              }`}
               readOnly={detalleHabilitado}
               value={
                 montoInput !== ""
                   ? montoInput
                   : editData?.monto !== undefined && editData?.monto !== 0
-                    ? String(editData.monto)
-                    : ""
+                  ? String(editData.monto)
+                  : ""
               }
-              onFocus={() => {
-                if ((editData?.monto || 0) === 0) {
-                  setMontoInput("");
-                }
-              }}
-              onChange={(e) => {
-                const val = e.target.value.replace(/[^0-9.]/g, "");
+              onChange={(val: string) => {
                 setMontoInput(val);
-                const num = parseFloat(val);
-                setEditData((prev) =>
-                  prev ? { ...prev, monto: isNaN(num) ? 0 : num } : null
-                );
+               const num = parseFloat(val);
+               setEditData((prev) =>
+                 prev ? { ...prev, monto: isNaN(num) ? 0 : num } : null
+               );
               }}
-              onBlur={(e) => {
-                const val = e.target.value;
-                if (val === "" || isNaN(Number(val))) {
-                  setMontoInput("");
-                  setEditData((prev) => (prev ? { ...prev, monto: 0 } : null));
-                }
-              }}
-              placeholder="0.00"
-              min={0}
-              step={0.01}
             />
             {detalleHabilitado && (
-              <div style={{ width: '100%' }} className="form-text text-muted small opacity-75">
+              <div
+                style={{ width: "100%" }}
+                className="form-text text-muted small opacity-75"
+              >
                 Con la opción "Detalle" habilitada este campo es calculado.
               </div>
             )}
-
-
           </div>
         );
       },
@@ -672,17 +649,16 @@ export const Cuentas = () => {
             <>---</>
           );
         }
-
-
-
         return (
           <div className="d-flex flex-column gap-4">
-
             {filas.length > 0 && (
               <div>
-
-
-                <table className="table table-sm align-middle dtr-inline" id="DataTables_Table_28" aria-describedby="DataTables_Table_28_info" data-zebra-custom="398bc2">
+                <table
+                  className="table table-sm align-middle dtr-inline"
+                  id="DataTables_Table_28"
+                  aria-describedby="DataTables_Table_28_info"
+                  data-zebra-custom="398bc2"
+                >
                   <thead className="text-muted fs-8 fw-bold">
                     <tr>
                       <th className="text-center w-60"></th>
@@ -695,12 +671,13 @@ export const Cuentas = () => {
 
                   <tbody>
                     {filas.length === 0 && (
-
-
                       <tr className="no-hover-row">
                         <td colSpan={5} className="dt-empty">
                           <div className="dt-empty-state d-flex flex-column align-items-center justify-content-center py-10">
-                            <i className="bi bi-inbox fs-1 text-muted" aria-hidden="true"></i>
+                            <i
+                              className="bi bi-inbox fs-1 text-muted"
+                              aria-hidden="true"
+                            ></i>
                             <span className="text-muted mt-2">Sin datos</span>
                           </div>
                         </td>
@@ -708,11 +685,8 @@ export const Cuentas = () => {
                     )}
 
                     {filas.map((it, idx) => (
-                      <React.Fragment key={'CardItemProforma' + idx}>
-
-
+                      <React.Fragment key={"CardItemProforma" + idx}>
                         {/* ======= Vista MÓVIL (< sm): grid 8/2/1/1 ======= */}
-
                         <tr className="d-table-row">
                           <td colSpan={4} className="pb-4">
                             <div className="p-2 py-4 pb-2 pt-1 border border-secoundary rounded-3 hoverElement">
@@ -726,38 +700,39 @@ export const Cuentas = () => {
 
 
                                 </div>
-
-
-
+                                <div className="text-end col-2"></div>
                               </div>
 
-                              <div className="row g-1">
+                              {/* Tabla para Nombre, Monto, Cantidad */}
+                              <table className="table table-bordered mb-2">
+                                <thead>
+                                  <tr>
+                                    <th className="fs-7 text-gray-600">Nombre</th>
+                                    <th className="fs-7 text-gray-600">Monto</th>
+                                    <th className="fs-7 text-gray-600">Cantidad</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>{it.nombre}</td>
+                                    <td style={{ whiteSpace: "nowrap" }}>{formatColones(it.valor)}</td>
+                                    <td>{it.cantidad || 1}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
 
-                                <div className="col-6">
-                                  <label htmlFor={'txtNombre' + idx.toString()} className="fs-7 text-gray-600">Nombre</label>
-                                  <p>{it.nombre}</p>
-                                </div>
-
-                                <div className="col-3">
-                                  <label htmlFor={'txtPrecio' + idx.toString()} className="fs-7 text-gray-600">Monto</label>
-                                  <p>{formatColones(it.valor)}</p>
-                                </div>
-
-
-                                <div className="col-3">
-                                  <label htmlFor={'txtCantidad' + idx.toString()} className="fs-7 text-gray-600">Cantidad</label>
-                                  <p>{it.cantidad || 1}</p>
-
-                                </div>
-
-
-
-                                <div className="row p-0">
-                                  <div className="text-start col-6"></div>
-                                  <div className="text-end col-6"><span className="fs-7 text-gray-600 mt-2">Importe</span> <span className="fs-7 text-gray-600 mt-2 ">{formatColones((+it.cantidad || 1) * (+it.valor || 0))}</span></div>
-
-
-
+                              {/* Importe separado */}
+                              <div className="row p-0">
+                                <div className="text-start col-6"></div>
+                                <div className="text-end col-6">
+                                  <span className="fs-7 text-gray-600 mt-2">
+                                    Importe
+                                  </span>{" "}
+                                  <span className="fs-7 text-gray-600 mt-2 ">
+                                    {formatColones(
+                                      (+it.cantidad || 1) * (+it.valor || 0)
+                                    )}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -765,38 +740,37 @@ export const Cuentas = () => {
                         </tr>
                       </React.Fragment>
                     ))}
-
-
                   </tbody>
-
                 </table>
-
-
-
               </div>
             )}
             <div className="d-flex flex-wrap gap-4 pt-5">
               <div className="d-flex flex-column">
-                <span className="text-muted fs-5">Descuento:  <span className="fw-bold text-dark fs-5">
-                  {detalle.descuento?.nombre === "Monto"
-                    ? `₡${Number(detalle.descuento?.valor ?? 0).toLocaleString(
-                      "es-CR",
-                      {
-                        minimumFractionDigits: 2,
-                      }
-                    )}`
-                    : `${Number(detalle.descuento?.valor ?? 0).toLocaleString(
-                      "es-CR"
-                    )}%`}
-                </span></span>
-
+                <span className="text-muted fs-5">
+                  Descuento:{" "}
+                  <span className="fw-bold text-dark fs-5">
+                    {detalle.descuento?.nombre === "Monto"
+                      ? `₡${Number(
+                          detalle.descuento?.valor ?? 0
+                        ).toLocaleString("es-CR", {
+                          minimumFractionDigits: 2,
+                        })}`
+                      : `${Number(detalle.descuento?.valor ?? 0).toLocaleString(
+                          "es-CR"
+                        )}%`}
+                  </span>
+                </span>
               </div>
               <div className="d-flex flex-column">
-                <span className="text-muted fs-5">Impuesto:   <span className="fw-bold text-dark fs-5">
-                  {Number(detalle.impuesto?.valor ?? 0).toLocaleString("es-CR")}
-                  %
-                </span></span>
-
+                <span className="text-muted fs-5">
+                  Impuesto:{" "}
+                  <span className="fw-bold text-dark fs-5">
+                    {Number(detalle.impuesto?.valor ?? 0).toLocaleString(
+                      "es-CR"
+                    )}
+                    %
+                  </span>
+                </span>
               </div>
               {/* <div className="py-3 d-flex flex-column">
                 <span className="text-muted fw-semibold small">Filas: <span className="fw-bold text-gray-800 fs-6">
@@ -922,15 +896,14 @@ export const Cuentas = () => {
           <InfoPanel msj="Seleccione un negocio para ver sus cuentas." />
         ) : (
           <>
-
             <GenericDataTable<DTO_Cuenta>
               ref={tableRef}
               title="Cuentas"
               columnKeys={columnKeysCuenta}
               labelMap={labelMapCuenta}
-              data={accountsPayable}       // se carga 1 sola vez
-              independent                  // ⇦ clave para que NO escuche más cambios del padre
-              idField="iD_Cuenta"          // ⇦ campo ID que usa upsert/remove
+              data={accountsPayable} // se carga 1 sola vez
+              independent // ⇦ clave para que NO escuche más cambios del padre
+              idField="iD_Cuenta" // ⇦ campo ID que usa upsert/remove
               onAdd={handleAddNew}
               onEdit={handleEdit}
               onDelete={handleDelete}
@@ -939,13 +912,25 @@ export const Cuentas = () => {
               customRenderers={customRenderers}
               customColumns={[detalleJSONColumn]}
               dataTableButtons={dataTableButtons}
-              onRowClick={(row) => { setRowTableSelected(row); setIsInfoModalOpen(true); }}
-              nowrapColumns={['iD_Cuenta', 'monto', 'montoAbonado', 'saldoPendiente', "tipoCuenta"]}
+              onRowClick={(row) => {
+                setRowTableSelected(row);
+                setIsInfoModalOpen(true);
+              }}
+              nowrapColumns={[
+                "iD_Cuenta",
+                "monto",
+                "montoAbonado",
+                "saldoPendiente",
+                "tipoCuenta",
+              ]}
             />
 
             <InfoModal
               show={isInfoModalOpen}
-              onHide={() => { setIsInfoModalOpen(false); setRowTableSelected(undefined); }}
+              onHide={() => {
+                setIsInfoModalOpen(false);
+                setRowTableSelected(undefined);
+              }}
               data={rowTableSelected!}
               fields={infoModalFields}
               headerButtons={headerButtonsToInfo}
@@ -955,6 +940,7 @@ export const Cuentas = () => {
               title="Crear una Cuenta"
               show={isModalFormOpen}
               onHide={handleCancelAdd}
+              loading={loadingForm}
               data={formData}
               setData={setFormData}
               onSubmit={handleSave}
@@ -966,7 +952,11 @@ export const Cuentas = () => {
             <GenericFormModal<DTO_Cuenta>
               title="Editar Cuenta"
               show={showEditModal}
-              onHide={() => { setShowEditModal(false); setErroresValidacion([]); }}
+              onHide={() => {
+                setShowEditModal(false);
+                setErroresValidacion([]);
+                }}
+              loading={loadingForm}
               data={editData!}
               setData={(x) => setEditData(x as DTO_Cuenta)}
               onSubmit={() => {
@@ -988,10 +978,14 @@ export const Cuentas = () => {
 
             <TransaccionesPorCuentaModal
               open={isTransaccionesModalOpen}
-              onHide={() => { setIsTransaccionesModalOpen(false); }}
+              onHide={() => {
+                setIsTransaccionesModalOpen(false);
+              }}
               cuenta={accountTransactions || new DTO_Cuenta()}
               negocioId={selectedBusiness?.iD_Negocio || 0}
-              onChange={(cuenta) => { tableRef.current?.upsert(cuenta) }}
+              onChange={(cuenta) => {
+                tableRef.current?.upsert(cuenta);
+              }}
             />
           </>
         )}
