@@ -8,6 +8,7 @@ import {
   LoadingPanel,
   ProformaCrearEditarModal,
   InfoPanel,
+  Toolbar,
 } from "@/components";
 import { STATUS_TBL } from "@/constants";
 import { useApp } from "@/hooks/useApp";
@@ -476,7 +477,8 @@ export const Proformas = () => {
   //#endregion
 
   return (
-    <>
+        <>
+        <Toolbar titulo="Proformas" addButton onAdd={handleAddNew}/>
       <div className="row p-4 gx-0">
         {state.negocio == null ? (
           <InfoPanel msj="Seleccione un negocio para ver sus proformas." />

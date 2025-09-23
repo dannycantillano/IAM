@@ -453,3 +453,33 @@ table.table.dataTable.table-hover>tbody>tr:hover>* {
   justify-content: space-between;
   gap: 1rem;
 }
+
+
+/*Toolbar*/
+
+/* Ajusta el z-index y el background si debe superponerse al contenido */
+.reveal-on-scroll {
+  position: sticky;      /* se queda pegado arriba cuando aparece */
+  top: 0;
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+  z-index: 100;          /* o más alto si lo necesitas */
+  background: #fff;      /* o la variable de tu tema */
+  will-change: transform, opacity;
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Respeta usuarios con reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll {
+    transition: none;
+    transform: none;
+  }
+}

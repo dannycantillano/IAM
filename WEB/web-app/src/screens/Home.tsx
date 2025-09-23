@@ -3,7 +3,7 @@ import { useApp } from "@/hooks/useApp";
 import { DTO_MetricaKPI, DTO_Negocio, DTO_Respuesta } from "@/models";
 import { metricaService } from "@/services";
 import { errorHelpers, notificationHelpers } from "@/utils";
-import { InfoPanel, KPI, LoadingPanel } from "@/components";
+import { InfoPanel, KPI, LoadingPanel, Toolbar } from "@/components";
 const OPCIONES = [
   { texto: "Hoy" },
   { texto: "Semana" },
@@ -72,6 +72,9 @@ export const Home = () => {
 
   return (
     <div>
+
+
+      <Toolbar titulo="Inicio" />
       <div className="toolbar pb-2 pt-2" id="kt_toolbar">
         {/* Botones: visibles desde sm ≥ 576 px */}
         <div className="container-fluid d-none d-sm-flex flex-nowrap gap-2">
@@ -80,9 +83,8 @@ export const Home = () => {
               key={texto}
               type="button"
               onClick={() => handleChange(texto)}
-              className={`btn btn-active-primary  ${
-                filtro === texto ? "active" : ""
-              }`}
+              className={`btn btn-active-primary  ${filtro === texto ? "active" : ""
+                }`}
             >
               {texto}
             </button>
@@ -107,29 +109,29 @@ export const Home = () => {
           </select>
         </div>
       </div>
- 
+
       <div className="row p-4 gx-0">
         {loading ? (
           <LoadingPanel msj="Cargando transacciones..." />
         ) : selectedBusiness ? (
           <div className="col-xl-12" style={{ marginTop: "75px" }}>
-        <div className="card card-xl-stretch mb-xl-8">
-          <div className="card-body p-4">
-            <div className="card position-relative">
-          <div className="row">
-            {kpis.map((kpi, i) => (
-              <KPI metrica={kpi} key={i} />
-            ))}
-          </div>
+            <div className="card card-xl-stretch mb-xl-8">
+              <div className="card-body p-4">
+                <div className="card position-relative">
+                  <div className="row">
+                    {kpis.map((kpi, i) => (
+                      <KPI metrica={kpi} key={i} />
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="col-xl-12" style={{ marginTop: "50px" }}>
+            <InfoPanel msj="Seleccione un negocio para ver las métricas." />
           </div>
-          ) : (
-              <div className="col-xl-12" style={{ marginTop: "50px" }}>
-                  <InfoPanel msj="Seleccione un negocio para ver las métricas." />
-              </div>
-            )}
+        )}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import {
   InfoPanel,
   ItemsOrdenDeServicioModal,
   ReferenciaCards,
+  Toolbar,
 } from "@/components";
 import ReactDOM from "react-dom/client";
 import {
@@ -1062,6 +1063,9 @@ export const OrdenDeServicio = () => {
 
   // #region 🧩 Render
   return (
+    <>
+    <Toolbar titulo="Ordenes de servicio" addButton onAdd={handleAddNew}/>
+
     <div className="row p-4 gx-0">
       {state.negocio == null ? (
         <InfoPanel msj="Seleccione un negocio para ver sus órdenes de servicio." />
@@ -1242,6 +1246,7 @@ export const OrdenDeServicio = () => {
         </>
       )}
     </div>
+    </>
   );
   // #endregion
 };

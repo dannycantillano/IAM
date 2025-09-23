@@ -68,8 +68,7 @@ export const Login = () => {
       login(user);
 
       notificationHelpers.successAlert(
-        `Hola ${
-          user.nombreUsuario + " " + user.apellido
+        `Hola ${user.nombreUsuario + " " + user.apellido
         }, bienvenido de nuevo 👋`
       );
       const lastPath =
@@ -107,16 +106,12 @@ export const Login = () => {
               <div className="text-center mb-10">
                 <h1 className="text-dark mb-3">Iniciar Sesión</h1>
 
-                <div className="text-gray-400 fw-bold fs-4">
-                  <Link to={ROUTES.SIGNUP} className="link-primary fw-bolder">
-                    Crear una cuenta
-                  </Link>
-                </div>
+
               </div>
 
               <div className="fv-row mb-10 fv-plugins-icon-container">
                 <label className="form-label fs-6 fw-bolder text-dark">
-                  Email
+                  Correo
                 </label>
                 <input
                   value={usuario?.correoUsuario}
@@ -143,7 +138,7 @@ export const Login = () => {
               <div className="fv-row mb-10 fv-plugins-icon-container">
                 <div className="d-flex flex-stack mb-2">
                   <label className="form-label fw-bolder text-dark fs-6 mb-0">
-                    Password
+                    Contraseña
                   </label>
                 </div>
                 <div className="position-relative mb-3">
@@ -165,9 +160,8 @@ export const Login = () => {
                     style={{ cursor: "pointer" }}
                   >
                     <i
-                      className={`bi bi-eye-slash fs-2${
-                        showPass ? " d-none" : ""
-                      }`}
+                      className={`bi bi-eye-slash fs-2${showPass ? " d-none" : ""
+                        }`}
                     />
                     <i
                       className={`bi bi-eye fs-2${!showPass ? " d-none" : ""}`}

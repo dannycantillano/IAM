@@ -13,6 +13,7 @@ import {
   InfoPanel,
   LoadingPanel,
   RestriccionModal,
+  Toolbar,
 } from "@/components";
 import {
   labelMapTransacciones,
@@ -162,7 +163,7 @@ export const Transacciones = () => {
   const handleCancelAdd = () => {
     setConfirmModalMessage("¿Deseas cancelar el registro de la transacción?");
     setConfirmContext("cancelAdd");
-    if(!compararObjetos(formData as DTO_Transacciones, new DTO_Transacciones, ["fechaTransaccion"]))
+    if (!compararObjetos(formData as DTO_Transacciones, new DTO_Transacciones, ["fechaTransaccion"]))
       setIsConfirmOpen(true);
     else
       setIsModalFormOpen(false);
@@ -244,7 +245,7 @@ export const Transacciones = () => {
       transaccionesService.actualizarTransaccion(updated).subscribe({
         next: () => {
           notificationHelpers.infoAlert("Transacción eliminada")
-        tableRef.current?.removeById(updated.iD_Transaccion);
+          tableRef.current?.removeById(updated.iD_Transaccion);
         },
         error: errorHelpers.serverError,
         complete: () => setLoadingForm(false),
@@ -322,41 +323,55 @@ export const Transacciones = () => {
 
   //#region 🎨 Render
   return (
-    <div className="row p-4 col-12 gx-0">
-      {state.negocio == null}
-      {loading ? (
-        <LoadingPanel msj="Cargando transacciones..." />
-      ) : selectedBusiness ? (
-        <GenericDataTable<DTO_Transacciones>
-          ref={tableRef}
-          title="Transacciones"
-          columnKeys={columnKeysTransacciones}
-          labelMap={labelMapTransacciones}
-          data={transacciones.filter(
-            (t) => t.estado?.iD_Estado !== STATUS_TBL.TRANSACTION.DELETED
-          )}
-          independent              
-          idField="iD_Transaccion" 
-          onAdd={handleAddNew}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          disableButtonAdd={disableButtonAdd}
-          onRowClick={(row) => setRowTableSelected(row)}
-          includeEstadoColumn={false}
-          customRenderers={customRenderers}
-          nowrapColumns={['Monto', 'ID']}
+    <>
+      <Toolbar titulo="Transacciones" addButton onAdd={handleAddNew} />
+      <div className="row p-4 col-12 gx-0">
+        {state.negocio == null}
+        {loading ? (
+          <LoadingPanel msj="Cargando transacciones..." />
+        ) : selectedBusiness ? (
+          <GenericDataTable<DTO_Transacciones>
+            ref={tableRef}
+            title="Transacciones"
+            columnKeys={columnKeysTransacciones}
+            labelMap={labelMapTransacciones}
+            data={transacciones.filter(
+              (t) => t.estado?.iD_Estado !== STATUS_TBL.TRANSACTION.DELETED
+            )}
+            independent
+            idField="iD_Transaccion"
+            onAdd={handleAddNew}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            disableButtonAdd={disableButtonAdd}
+            onRowClick={(row) => setRowTableSelected(row)}
+            includeEstadoColumn={false}
+            customRenderers={customRenderers}
+            nowrapColumns={['Monto', 'ID']}
 
+          />
+        ) : (
+          <InfoPanel msj="Selecciona un negocio para ver sus transacciones." />
+        )}
+
+        <InfoModal
+          show={!!rowTableSelected}
+          onHide={() => setRowTableSelected(undefined)}
+          data={rowTableSelected!}
+          fields={infoModalFields}
         />
-      ) : (
-        <InfoPanel msj="Selecciona un negocio para ver sus transacciones." />
-      )}
 
-      <InfoModal
-        show={!!rowTableSelected}
-        onHide={() => setRowTableSelected(undefined)}
-        data={rowTableSelected!}
-        fields={infoModalFields}
-      />
+        <GenericFormModal<DTO_Transacciones>
+          title="Registrar Transacción"
+          show={isModalFormOpen}
+          onHide={handleCancelAdd}
+          data={formData}
+          setData={setFormData}
+          onSubmit={handleSave}
+          fields={transaccionesFormEditFields}
+          erroresValidacion={erroresValidacion}
+          onEliminarError={eliminarError}
+        />
 
       <GenericFormModal<DTO_Transacciones>
         title="Registrar Transacción"
@@ -384,19 +399,20 @@ export const Transacciones = () => {
         onEliminarError={eliminarError}
       />
 
-      <ConfirmModal
-        show={isConfirmOpen}
-        confirmMessage={confirmModalMessage}
-        onAction={confirmModalAction}
-      />
+        <ConfirmModal
+          show={isConfirmOpen}
+          confirmMessage={confirmModalMessage}
+          onAction={confirmModalAction}
+        />
 
-      <RestriccionModal
-        modalTitle="Acción no permitida"
-        modalTexto="No tienes permisos para modificar esta transacción porque fue creada automáticamente desde el módulo de cuentas. Si deseas cambiar algo, primero debes eliminarla y luego crear una nueva transacción con los cambios deseados."
-        show={isModalRestriccionOpen}
-        onClose={() => setIsModalRestriccionOpen(false)}
-      />
-    </div>
+        <RestriccionModal
+          modalTitle="Acción no permitida"
+          modalTexto="No tienes permisos para modificar esta transacción porque fue creada automáticamente desde el módulo de cuentas. Si deseas cambiar algo, primero debes eliminarla y luego crear una nueva transacción con los cambios deseados."
+          show={isModalRestriccionOpen}
+          onClose={() => setIsModalRestriccionOpen(false)}
+        />
+      </div>
+    </>
   );
   //#endregion
 };

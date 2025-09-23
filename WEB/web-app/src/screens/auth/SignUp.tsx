@@ -94,12 +94,13 @@ export const SignUp = () => {
               className="form w-100 fv-plugins-bootstrap5 fv-plugins-framework"
               noValidate
               id="kt_sign_up_form"
+              autoComplete="off"
             >
               <div className="mb-10 text-center">
                 <h1 className="text-dark mb-3">Registrar cuenta</h1>
 
                 <div className="text-gray-400 fw-bold fs-4">
-                  Ya tienes una cuenta?{" "}
+                  ¿Ya tienes una cuenta?{" "}
                   <Link to={ROUTES.LOGIN} className="link-primary fw-bolder">
                     Iniciar sesión
                   </Link>
@@ -109,7 +110,7 @@ export const SignUp = () => {
               <div className="row fv-row mb-7 fv-plugins-icon-container">
                 <div className="col-xl-6">
                   <label className="form-label fw-bolder text-dark fs-6 required">
-                    Nombre
+                    Nombre(s)
                   </label>
                   <input
                     value={usuario?.nombreUsuario}
@@ -134,9 +135,10 @@ export const SignUp = () => {
 
                 <div className="col-xl-6">
                   <label className="form-label fw-bolder text-dark fs-6 required">
-                    Apellido
+                    Apellido(s)
                   </label>
                   <input
+                  
                     value={usuario?.apellido}
                     onChange={(e) => {
                       eliminarError(e.target.name);
@@ -186,9 +188,11 @@ export const SignUp = () => {
 
               <div className="fv-row mb-10 fv-plugins-icon-container">
                 <label className="form-label fs-6 fw-bolder text-dark required">
-                  Email
+                  Correo
                 </label>
                 <input
+                  autoComplete="username"
+                  key={"txtCorreo"}
                   value={usuario?.correoUsuario}
                   onChange={(e) => {
                     eliminarError(e.target.name);
@@ -196,8 +200,7 @@ export const SignUp = () => {
                   }}
                   className="form-control form-control-lg form-control-solid"
                   type="text"
-                  name="correoUsuario"
-                  autoComplete="off"
+                  name="txtCorreoUsuario"
                   placeholder="ejemplo@gmail.com"
                 />
                 {erroresValidacion
@@ -228,8 +231,8 @@ export const SignUp = () => {
                       }}
                       className="form-control form-control-lg form-control-solid"
                       type={showPass ? "text" : "password"}
-                      name="pass"
-                      autoComplete="off"
+                      name="txtpass"
+                      autoComplete="new-password"
                     />
                     <span
                       onClick={() => {

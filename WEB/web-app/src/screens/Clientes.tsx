@@ -5,6 +5,7 @@ import {
   GenericFormModal,
   InfoModal,
   LoadingPanel,
+  Toolbar,
 } from "@/components";
 import { DTO_Cliente, DTO_Param, DTO_Respuesta } from "@/models";
 import { clientesService } from "@/services";
@@ -260,29 +261,31 @@ export const Clientes = () => {
 
   //#region 🎨 Render
   return (
-    <div className="row p-4 gx-0">
-      {loadingTable ? (
-        <LoadingPanel msj="Cargando clientes, por favor espere..." />
-      ) : (
-        <GenericDataTable<DTO_Cliente>
-          title="Clientes"
-          columnKeys={columnKeysCliente}
-          labelMap={labelMapCliente}
-          data={clientesActivos}
-          onAdd={handleAddNew}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          includeEstadoColumn={false}
-          onRowClick={(row) => setRowTableSelected(row)}
-        />
-      )}
+    <>
+      <Toolbar titulo="Clientes" addButton onAdd={handleAddNew} />
+      <div className="row p-4 gx-0">
+        {loadingTable ? (
+          <LoadingPanel msj="Cargando clientes, por favor espere..." />
+        ) : (
+          <GenericDataTable<DTO_Cliente>
+            title="Clientes"
+            columnKeys={columnKeysCliente}
+            labelMap={labelMapCliente}
+            data={clientesActivos}
+            onAdd={handleAddNew}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            includeEstadoColumn={false}
+            onRowClick={(row) => setRowTableSelected(row)}
+          />
+        )}
 
-      <InfoModal
-        show={!!rowTableSelected}
-        onHide={() => setRowTableSelected(undefined)}
-        data={rowTableSelected!}
-        fields={keysInfoModalCliente}
-      />
+        <InfoModal
+          show={!!rowTableSelected}
+          onHide={() => setRowTableSelected(undefined)}
+          data={rowTableSelected!}
+          fields={keysInfoModalCliente}
+        />
 
       <GenericFormModal
         title="Registrar Cliente"
@@ -310,12 +313,13 @@ export const Clientes = () => {
         onEliminarError={eliminarError}
       />
 
-      <ConfirmModal
-        show={isConfirmOpen}
-        confirmMessage={confirmModalMessage}
-        onAction={confirmModalAction}
-      />
-    </div>
+        <ConfirmModal
+          show={isConfirmOpen}
+          confirmMessage={confirmModalMessage}
+          onAction={confirmModalAction}
+        />
+      </div>
+    </>
   );
   //#endregion
 };

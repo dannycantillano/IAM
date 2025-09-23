@@ -7,6 +7,7 @@ import {
   InfoModal,
   ReferenciaCards,
   ReferenciasJsonInput,
+  Toolbar,
 } from "@/components";
 import ReactDOM from "react-dom/client";
 import { FILTER_STATUS, STATUS_TBL } from "@/constants";
@@ -397,35 +398,37 @@ export const Negocio = () => {
 
   //#region 🎨 Render
   return (
-    <div className="row p-4 col-12 gx-0">
-      <GenericDataTable<DTO_Negocio>
-        title="Negocios"
-        columnKeys={columnKeysNegocio}
-        labelMap={labelMapNegocio}
-        data={business.filter(
-          (b) => b.estado?.iD_Estado !== STATUS_TBL.BUSINESS.DELETED
-        )}
-        onAdd={handleAddNewBusiness}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        disableButtonAdd={disableButtonAdd}
-        includeEstadoColumn
-        customRenderers={{
-          fechaRegistro: (val: unknown) =>
-            val ? new Date(String(val)).toLocaleDateString() : "",
-        }}
-        customColumns={[referenciaJSONColumn]}
-        onRowClick={(rowData) => {
-          setRowTableSelected(rowData);
-        }}
-      />
+    <>
+      <Toolbar titulo="Negocios" addButton onAdd={handleAddNewBusiness} />
+      <div className="row p-4 col-12 gx-0">
+        <GenericDataTable<DTO_Negocio>
+          title="Negocios"
+          columnKeys={columnKeysNegocio}
+          labelMap={labelMapNegocio}
+          data={business.filter(
+            (b) => b.estado?.iD_Estado !== STATUS_TBL.BUSINESS.DELETED
+          )}
+          onAdd={handleAddNewBusiness}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          disableButtonAdd={disableButtonAdd}
+          includeEstadoColumn
+          customRenderers={{
+            fechaRegistro: (val: unknown) =>
+              val ? new Date(String(val)).toLocaleDateString() : "",
+          }}
+          customColumns={[referenciaJSONColumn]}
+          onRowClick={(rowData) => {
+            setRowTableSelected(rowData);
+          }}
+        />
 
-      <InfoModal
-        show={!!rowTableSelected}
-        onHide={() => setRowTableSelected(undefined)}
-        data={rowTableSelected!}
-        fields={infoModalFields}
-      />
+        <InfoModal
+          show={!!rowTableSelected}
+          onHide={() => setRowTableSelected(undefined)}
+          data={rowTableSelected!}
+          fields={infoModalFields}
+        />
 
       <GenericFormModal
         title="Registrar Negocio"
@@ -453,12 +456,13 @@ export const Negocio = () => {
         onEliminarError={eliminarError}
       />
 
-      <ConfirmModal
-        show={isConfirmOpen}
-        confirmMessage={confirmModalMessage}
-        onAction={confirmModalAcion}
-      />
-    </div>
+        <ConfirmModal
+          show={isConfirmOpen}
+          confirmMessage={confirmModalMessage}
+          onAction={confirmModalAcion}
+        />
+      </div>
+    </>
   );
   //#endregion
 };

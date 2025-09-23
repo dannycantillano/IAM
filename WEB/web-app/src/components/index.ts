@@ -11,3 +11,4 @@ export * from "./selects"
 export * from "./Stepper"
 export * from "./Tables";
 export * from "./ui";
+export * from "./Toolbar"
