@@ -99,7 +99,7 @@ builder.Services.Configure<ResendClientOptions>(o =>
 });
 builder.Services.AddTransient<IResend, ResendClient>();
 
-// Nuestro wrapper (IEmailSender) y settings tipados
+// Wrapper (IEmailSender) y settings tipados
 builder.Services.Configure<ResendSettings>(o =>
 {
     o.ApiKey = resendApiKey ?? string.Empty;
