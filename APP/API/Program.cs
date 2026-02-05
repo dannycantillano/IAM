@@ -111,23 +111,22 @@ builder.Services.AddScoped<IEmailSender, ResendEmailSender>();
 #endregion
 
 #region CORS Configuration
-// Cambiar la referencia explícita para evitar la ambigüedad  
-var raw = System.Configuration.ConfigurationManager.AppSettings["ClientURLs"];
+// Lee de AppSettings y también de variables de entorno (Render/Azure: Application settings)
+var raw = System.Configuration.ConfigurationManager.AppSettings["ClientURLs"]
+          ?? builder.Configuration["ClientURLs"]; // e.g. "https://iam-demo.netlify.app, http://localhost:5173"
 
-// 3) Separar, limpiar y normalizar
 var clientUrls = raw?
     .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
     .Select(u => u.Trim())
-    .Where(u => !string.IsNullOrEmpty(u))
+    .Where(u => !string.IsNullOrWhiteSpace(u))
     .Distinct()
     .ToArray() ?? Array.Empty<string>();
 
-// ✅ CORS configuration => CORS significa Cross-Origin Resource Sharing ("compartición de recursos entre orígenes cruzados").
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontendDev", policy =>
     {
-        if (clientUrls != null && clientUrls.Length > 0)
+        if (clientUrls.Length > 0)
         {
             policy.WithOrigins(clientUrls)
                   .AllowAnyHeader()
@@ -137,14 +136,21 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            // Manejar el caso donde `clientUrls` es nulo o vacío
-            throw new InvalidOperationException("La configuración de ClientURLs no puede ser nula o vacía.");
+            // Fallback en demo: permitir todo si aún no tienes configurado ClientURLs
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
         }
     });
 });
 #endregion
 
 var app = builder.Build();
+// Cookies cross-site (Netlify -> Azure App Service)
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    MinimumSameSitePolicy = SameSiteMode.None,
+    Secure = CookieSecurePolicy.Always
+});
+
 
 #region Middleware Pipeline Configuration
 app.UseSwagger();
@@ -153,6 +159,9 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontendDev");
+
+// Healthcheck simple para validar despliegue
+app.MapGet("/health", () => Results.Json(new { status = "ok" })).WithTags("Health");
 
 // Middleware personalizado para renovación de tokens
 app.Use(async (context, next) =>

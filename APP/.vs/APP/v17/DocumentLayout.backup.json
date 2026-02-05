@@ -3,44 +3,20 @@
   "WorkspaceRootPath": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\readme.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:readme.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj.user||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:API\\API.csproj.user||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\Controllers\\WeatherForecastController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:API\\Controllers\\WeatherForecastController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:API\\API.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\WeatherForecast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:API\\WeatherForecast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Sesion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DTO\\DTO_Sesion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:API\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\UTL\\Properties\\AssemblyInfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:UTL\\Properties\\AssemblyInfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\UTL\\UTL.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:UTL\\UTL.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DTO\\DTO.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DLL\\Properties\\AssemblyInfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DLL\\Properties\\AssemblyInfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DLL\\DLL.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DLL\\DLL.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DAL\\DAL.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DAL\\DAL.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Estado.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DTO\\DTO_Estado.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -75,131 +51,53 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "readme.txt",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\readme.txt",
-              "RelativeDocumentMoniker": "readme.txt",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\readme.txt",
-              "RelativeToolTip": "readme.txt",
+              "Title": "API.csproj.user",
+              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj.user",
+              "RelativeDocumentMoniker": "API\\API.csproj.user",
+              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj.user",
+              "RelativeToolTip": "API\\API.csproj.user",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2025-05-05T06:13:27.56Z",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003464|",
+              "WhenOpened": "2025-05-08T17:49:02.477Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "WeatherForecastController.cs",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\Controllers\\WeatherForecastController.cs",
-              "RelativeDocumentMoniker": "API\\Controllers\\WeatherForecastController.cs",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\Controllers\\WeatherForecastController.cs",
-              "RelativeToolTip": "API\\Controllers\\WeatherForecastController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-05T06:12:58.829Z",
+              "Title": "API.csproj",
+              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj",
+              "RelativeDocumentMoniker": "API\\API.csproj",
+              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj",
+              "RelativeToolTip": "API\\API.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-05-08T17:48:54.908Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "WeatherForecast.cs",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\WeatherForecast.cs",
-              "RelativeDocumentMoniker": "API\\WeatherForecast.cs",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\WeatherForecast.cs",
-              "RelativeToolTip": "API\\WeatherForecast.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "DTO_Sesion.cs",
+              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Sesion.cs",
+              "RelativeDocumentMoniker": "DTO\\DTO_Sesion.cs",
+              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Sesion.cs",
+              "RelativeToolTip": "DTO\\DTO_Sesion.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAACUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-05T06:12:32.114Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "AssemblyInfo.cs",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\UTL\\Properties\\AssemblyInfo.cs",
-              "RelativeDocumentMoniker": "UTL\\Properties\\AssemblyInfo.cs",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\UTL\\Properties\\AssemblyInfo.cs",
-              "RelativeToolTip": "UTL\\Properties\\AssemblyInfo.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAA4AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-05T06:12:11.417Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "UTL.csproj",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\UTL\\UTL.csproj",
-              "RelativeDocumentMoniker": "UTL\\UTL.csproj",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\UTL\\UTL.csproj",
-              "RelativeToolTip": "UTL\\UTL.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-05-05T06:12:06.129Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "DTO.csproj",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO.csproj",
-              "RelativeDocumentMoniker": "DTO\\DTO.csproj",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO.csproj",
-              "RelativeToolTip": "DTO\\DTO.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-05-05T06:12:01.037Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "AssemblyInfo.cs",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DLL\\Properties\\AssemblyInfo.cs",
-              "RelativeDocumentMoniker": "DLL\\Properties\\AssemblyInfo.cs",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DLL\\Properties\\AssemblyInfo.cs",
-              "RelativeToolTip": "DLL\\Properties\\AssemblyInfo.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAaAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-05T06:11:49.401Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "DLL.csproj",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DLL\\DLL.csproj",
-              "RelativeDocumentMoniker": "DLL\\DLL.csproj",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DLL\\DLL.csproj",
-              "RelativeToolTip": "DLL\\DLL.csproj",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-05-05T06:11:43.348Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "DAL.csproj",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DAL\\DAL.csproj",
-              "RelativeDocumentMoniker": "DAL\\DAL.csproj",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DAL\\DAL.csproj",
-              "RelativeToolTip": "DAL\\DAL.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-05-05T06:11:36.476Z",
+              "WhenOpened": "2025-05-08T17:45:33.623Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\Program.cs",
-              "RelativeDocumentMoniker": "API\\Program.cs",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\Program.cs",
-              "RelativeToolTip": "API\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
+              "Title": "DTO_Estado.cs",
+              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Estado.cs",
+              "RelativeDocumentMoniker": "DTO\\DTO_Estado.cs",
+              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Estado.cs",
+              "RelativeToolTip": "DTO\\DTO_Estado.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-05T06:10:30.638Z",
+              "WhenOpened": "2025-05-08T17:45:06.415Z",
               "EditorCaption": ""
             }
           ]

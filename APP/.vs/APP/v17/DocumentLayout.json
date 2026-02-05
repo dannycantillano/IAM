@@ -1,21 +1,20 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\",
+  "WorkspaceRootPath": "C:\\Proyects_2026_progra\\IAM\\IAM\\APP\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj.user||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:API\\API.csproj.user||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj.user||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2026_progra\\IAM\\IAM\\APP\\API\\API.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:API\\API.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Sesion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2026_progra\\IAM\\IAM\\APP\\DTO\\DTO_Sesion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DTO\\DTO_Sesion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Estado.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Proyects_2026_progra\\IAM\\IAM\\APP\\DTO\\DTO_Estado.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DTO\\DTO_Estado.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -53,10 +52,10 @@
               "DocumentIndex": 0,
               "Title": "API.csproj.user",
               "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj.user",
-              "RelativeDocumentMoniker": "API\\API.csproj.user",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj.user",
               "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj.user",
-              "RelativeToolTip": "API\\API.csproj.user",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "RelativeToolTip": "..\\..\\..\\..\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj.user",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003464|",
               "WhenOpened": "2025-05-08T17:49:02.477Z",
               "EditorCaption": ""
@@ -65,40 +64,37 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "API.csproj",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj",
+              "DocumentMoniker": "C:\\Proyects_2026_progra\\IAM\\IAM\\APP\\API\\API.csproj",
               "RelativeDocumentMoniker": "API\\API.csproj",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\API\\API.csproj",
+              "ToolTip": "C:\\Proyects_2026_progra\\IAM\\IAM\\APP\\API\\API.csproj",
               "RelativeToolTip": "API\\API.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-05-08T17:48:54.908Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-08T17:48:54.908Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
               "Title": "DTO_Sesion.cs",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Sesion.cs",
+              "DocumentMoniker": "C:\\Proyects_2026_progra\\IAM\\IAM\\APP\\DTO\\DTO_Sesion.cs",
               "RelativeDocumentMoniker": "DTO\\DTO_Sesion.cs",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Sesion.cs",
+              "ToolTip": "C:\\Proyects_2026_progra\\IAM\\IAM\\APP\\DTO\\DTO_Sesion.cs",
               "RelativeToolTip": "DTO\\DTO_Sesion.cs",
               "ViewState": "AgIAAAwAAAAAAAAAAAAAACUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-08T17:45:33.623Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-08T17:45:33.623Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
               "Title": "DTO_Estado.cs",
-              "DocumentMoniker": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Estado.cs",
+              "DocumentMoniker": "C:\\Proyects_2026_progra\\IAM\\IAM\\APP\\DTO\\DTO_Estado.cs",
               "RelativeDocumentMoniker": "DTO\\DTO_Estado.cs",
-              "ToolTip": "C:\\Proyects_2025_progra\\TallerProyect\\IAM\\APP\\DTO\\DTO_Estado.cs",
+              "ToolTip": "C:\\Proyects_2026_progra\\IAM\\IAM\\APP\\DTO\\DTO_Estado.cs",
               "RelativeToolTip": "DTO\\DTO_Estado.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-08T17:45:06.415Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-08T17:45:06.415Z"
             }
           ]
         }
