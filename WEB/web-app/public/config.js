@@ -1,6 +1,4 @@
-
+// Demo: apunta al backend publicado
 window.__APP_CONFIG__ = {
-  // IIS Express
-  BASE_URL: 'https://localhost:44330'
+  BASE_URL: 'https://iam-backend.azurewebsites.net' // reemplaza por tu dominio real
 };
-

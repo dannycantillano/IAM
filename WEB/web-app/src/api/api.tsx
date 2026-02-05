@@ -2,8 +2,19 @@ import axios, { AxiosResponse } from "axios";
 import { STATUS } from "@/constants/status";
 import { useLogoutUser } from "@/utils/authHelpers";
 
+type RuntimeConfig = {
+  BASE_URL: string;
+};
+
+// Fallbacks: primero runtime (config.js), luego Vite env, luego CRA env, luego localhost
+const baseUrl =
+  (window as any).__APP_CONFIG__?.BASE_URL ??
+  (import.meta as any)?.env?.VITE_API_BASE_URL ??
+  (process?.env as any)?.REACT_APP_API_BASE_URL ??
+  "https://localhost:44330";
+
 export const api = axios.create({
-  baseURL: window.__APP_CONFIG__!.BASE_URL + "/api",
+  baseURL: `${baseUrl}/api`,
   withCredentials: true,
   timeout: 1500000,
   headers: {
@@ -20,7 +31,7 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Interceptor de respuesta
@@ -37,7 +48,7 @@ api.interceptors.response.use(
 
     // NETWORK ERROR sin respuesta
     if (!error.response) {
-      console.warn("🌐 Network error sin response");
+      console.warn("🌐 Network error without response");
       return Promise.reject(error);
     }
 
@@ -48,18 +59,21 @@ api.interceptors.response.use(
     }
 
     // 403 → posible renovación de token
-    if (error.response.status === STATUS.TOKEN_REFRESH_REQUIRED && !originalRequest._retry) {
-      originalRequest._retry = true;
+    if (
+      error.response.status === STATUS.TOKEN_REFRESH_REQUIRED &&
+      !(originalRequest as any)._retry
+    ) {
+      (originalRequest as any)._retry = true;
 
       const nuevoToken = error.response?.data?.resultado?.[0]?.accesToken;
       if (nuevoToken) {
         console.info("🔁 Token renovado automáticamente");
         localStorage.setItem("accesToken", nuevoToken);
-        originalRequest.headers.Authorization = `Bearer ${nuevoToken}`;
+        (originalRequest as any).headers.Authorization = `Bearer ${nuevoToken}`;
         return api(originalRequest); // 🔁 Reintenta la petición original
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
